@@ -51,6 +51,16 @@ TEST(c_api_registry, selec_entities)
 
     ASSERT_EQ(regResult, regResultExpected);
 
+    regResultExpected = std::vector(componentsEntity1.size(), reg_result::success),
+        regResult = regResultExpected;
+
+    register_components(entity1,
+                        componentsEntity1.data(),
+                        componentsEntity1.size(),
+                        regResult.data());
+
+    ASSERT_EQ(regResult, regResultExpected);
+
     entity_selection entitySelection{};
 
     std::vector<component> selectComponents{
