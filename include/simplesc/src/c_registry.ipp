@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <optional>
 #include <unordered_map>
 
 namespace std
@@ -46,6 +47,70 @@ namespace eld
     public:
         static components_table &instance() { return components_table::instance_; }
 
+        void register_components(const c_api::entity &owningEntity,
+                                 const c_api::component *componentArray,
+                                 size_t length,
+                                 c_api::reg_result *&resArray)
+        {
+            for (size_t i = 0; i != length; ++i)
+            {
+                const auto res = register_component(owningEntity, componentArray[i]);
+                if (resArray)
+                    resArray[i] = res;
+            }
+        }
+
+        c_api::reg_result register_component(const c_api::entity &owningEntity,
+                                const c_api::component &component)
+        {
+            auto optionalColumn = get_column(component);
+            if (!optionalColumn)
+            {
+                componentsTable_.emplace(std::make_pair(component, std::vector{ owningEntity }));
+                return c_api::reg_result::success;
+            }
+
+            component_column &column = *optionalColumn;
+            auto iter = std::find(column.cbegin(), column.cend(), owningEntity);
+            if (iter != column.cend())
+                return c_api::reg_result::component_already_registered;
+
+            column.push_back(owningEntity);
+            std::sort(column.begin(), column.end());
+
+            return c_api::reg_result::success;
+        }
+
+        void unregister_components(const c_api::entity &owningEntity,
+                                   const c_api::component *componentArray,
+                                   size_t length,
+                                   c_api::unreg_result *&resArray)
+        {
+            for (size_t i = 0; i != length; ++i)
+            {
+                const auto res = unregister_component(owningEntity, componentArray[i]);
+                if (resArray)
+                    resArray[i] = res;
+            }
+        }
+
+        c_api::unreg_result unregister_component(const c_api::entity &owningEntity,
+                                  const c_api::component &component)
+        {
+            auto optionalColumn = get_column(component);
+            if (!optionalColumn)
+                return c_api::unreg_result::component_not_found;
+
+            component_column &column = *optionalColumn;
+
+            auto iter = std::find(column.cbegin(), column.cend(), owningEntity);
+            if (iter == column.cend())
+                return c_api::unreg_result::component_not_registered;
+
+            column.erase(iter);
+            return c_api::unreg_result::success;
+        }
+
         c_api::entity_selection select(const std::vector<c_api::component> &selectComponents)
         {
             auto selected = selector_(componentsTable_, selectComponents);
@@ -63,6 +128,8 @@ namespace eld
         void free(const c_api::entity_selection &selection) { selections_.erase(selection.handle); }
 
     private:
+        using component_column = std::vector<c_api::entity>;
+
         size_t get_next_id()
         {
             if (!freedSelection_)
@@ -73,12 +140,22 @@ namespace eld
             return temp;
         }
 
+        auto get_column(const c_api::component &component)
+            -> std::optional<std::reference_wrapper<component_column>>
+        {
+            auto found = componentsTable_.find(component);
+            if (found == componentsTable_.cend())
+                return std::nullopt;
+
+            return found->second;
+        }
+
     private:
         static components_table instance_;
 
         eld::generic::selector<eld::impl::selector_std<c_api::entity, c_api::component>> selector_;
 
-        std::unordered_map<c_api::component, std::vector<c_api::entity>> componentsTable_;
+        std::unordered_map<c_api::component, component_column> componentsTable_;
 
         // TODO: standalone class
         std::unordered_map<size_t, entity_selection> selections_;
@@ -90,11 +167,34 @@ namespace eld
 
     namespace c_api
     {
+        void register_components(const entity &owningEntity,
+                                 const component *array,
+                                 size_t length,
+                                 reg_result *&results)
+        {
+            if (!array ||   //
+                !length)
+                return;
+
+            components_table::instance().register_components(owningEntity, array, length, results);
+        }
+
+        void unregister_components(const entity &owningEntity,
+                                   const component *array,
+                                   size_t length,
+                                   unreg_result *&results)
+        {
+            if (!array ||   //
+                !length)
+                return;
+
+            components_table::instance().unregister_components(owningEntity, array, length, results);
+        }
+
         void select_entities_by_components(const component *array,
                                            size_t length,
                                            entity_selection &result)
         {
-            // TODO: implement
             using difference_type = std::iterator_traits<decltype(array)>::difference_type;
             result = components_table::instance().select(
                 std::vector<component>(array, std::next(array, difference_type(length))));
