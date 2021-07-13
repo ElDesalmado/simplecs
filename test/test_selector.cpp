@@ -69,8 +69,23 @@ TEST(selector_std, multiple_columns)
     };
     SelectorStd selector{};
 
-    std::vector<EntityId> expected{2, 4},
-        selected = selector(table, std::vector<ComponentId>{0, 1});
+    std::vector<EntityId> expected{ 2, 4 },
+        selected = selector(table, std::vector<ComponentId>{ 0, 1 });
+
+    ASSERT_EQ(selected, expected);
+}
+
+TEST(selector_std, multiple_columns_2)
+{
+    std::unordered_map<ComponentId, std::vector<EntityId>> table{
+        std::make_pair(0, std::vector<EntityId>{ 1, 2, 3, 4, 5 }),
+        std::make_pair(1, std::vector<EntityId>{ 2, 4, 6 }),
+        std::make_pair(42, std::vector<EntityId>())
+    };
+    SelectorStd selector{};
+
+    std::vector<EntityId> expected{},
+        selected = selector(table, std::vector<ComponentId>{ 0, 1, 42 });
 
     ASSERT_EQ(selected, expected);
 }
