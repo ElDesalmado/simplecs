@@ -50,7 +50,7 @@ namespace eld
                 if (custom::empty(filteredColumns, impl_))
                     return {};
 
-                return impl_.set_intersection(std::move(filteredColumns));
+                return impl_.set_intersection(filteredColumns);
             }
 
         private:
