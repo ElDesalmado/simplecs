@@ -7,7 +7,7 @@
 namespace eld::impl
 {
     template<typename EntityT, typename ComponentT>
-    class selector_std_impl
+    class selector_std
     {
     public:
         using entity_id_type = EntityT;

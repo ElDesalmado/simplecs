@@ -2,7 +2,7 @@
 target_link_libraries(sandbox registry)
 
 add_executable(test.selector test_selector.cpp)
-target_link_libraries(test.selector registry GTest::gtest)
+target_link_libraries(test.selector simplesc GTest::gtest)
 
 add_test(NAME test.selector
         COMMAND test.selector)

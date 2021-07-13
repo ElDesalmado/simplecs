@@ -7,7 +7,7 @@
 using EntityId = size_t;
 using ComponentId = size_t;
 
-using SelectorStd = eld::generic::selector<eld::impl::selector_std_impl<EntityId, ComponentId>>;
+using SelectorStd = eld::generic::selector<eld::impl::selector_std<EntityId, ComponentId>>;
 
 // TODO: test scenarios and implementations
 
