@@ -50,7 +50,7 @@ namespace eld
         void register_components(const c_api::entity &owningEntity,
                                  const c_api::component *componentArray,
                                  size_t length,
-                                 c_api::reg_result *&resArray)
+                                 c_api::reg_result *resArray)
         {
             for (size_t i = 0; i != length; ++i)
             {
@@ -84,7 +84,7 @@ namespace eld
         void unregister_components(const c_api::entity &owningEntity,
                                    const c_api::component *componentArray,
                                    size_t length,
-                                   c_api::unreg_result *&resArray)
+                                   c_api::unreg_result *resArray)
         {
             for (size_t i = 0; i != length; ++i)
             {
@@ -125,7 +125,13 @@ namespace eld
             return selection;
         }
 
-        void free(const c_api::entity_selection &selection) { selections_.erase(selection.handle); }
+        void free(c_api::entity_selection &selection)
+        {
+            selections_.erase(selection.handle);
+            selection.array = nullptr;
+            selection.length = 0;
+            selection.handle = c_api::invalid_id;
+        }
 
     private:
         using component_column = std::vector<c_api::entity>;
@@ -170,7 +176,7 @@ namespace eld
         void register_components(const entity &owningEntity,
                                  const component *array,
                                  size_t length,
-                                 reg_result *&results)
+                                 reg_result *results)
         {
             if (!array ||   //
                 !length)
@@ -182,7 +188,7 @@ namespace eld
         void unregister_components(const entity &owningEntity,
                                    const component *array,
                                    size_t length,
-                                   unreg_result *&results)
+                                   unreg_result *results)
         {
             if (!array ||   //
                 !length)
@@ -200,7 +206,7 @@ namespace eld
                 std::vector<component>(array, std::next(array, difference_type(length))));
         }
 
-        void free_entity_selection(const entity_selection &selection)
+        void free_entity_selection(entity_selection &selection)
         {
             components_table::instance().free(selection);
         }

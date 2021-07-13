@@ -4,6 +4,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+#include <numeric>
 
 namespace eld::c_api
 {
@@ -46,22 +48,24 @@ namespace eld::c_api
         component_not_registered
     };
 
+    constexpr size_t invalid_id = std::numeric_limits<size_t>::max();
+
     extern "C"
     {
         SIMPLESC_DECL void register_components(const entity &,
                                                const component *array,
                                                size_t length,
-                                               reg_result *&results);
+                                               reg_result *results);
 
         SIMPLESC_DECL void unregister_components(const entity &,
                                                  const component *array,
                                                  size_t length,
-                                                 unreg_result *& results);
+                                                 unreg_result *results);
 
         SIMPLESC_DECL void select_entities_by_components(const component *array,
                                                          size_t length,
                                                          entity_selection &result);
-        SIMPLESC_DECL void free_entity_selection(const entity_selection &);
+        SIMPLESC_DECL void free_entity_selection(entity_selection &);
     }
 
     constexpr inline bool operator<(const entity &lhs, const entity &rhs)
