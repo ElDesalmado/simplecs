@@ -6,8 +6,7 @@
 #include <functional>
 #include <tuple>
 #include <vector>
-
-#include <new>
+#include <optional>
 
 namespace std
 {
@@ -35,16 +34,26 @@ namespace eld::c_core
         c_api::deallocate_component_error deallocate(const c_api::entity_descriptor &entity,
                                                      c_api::component_pointer *&pointer);
 
+        c_api::allocate_component_error construct(const c_api::entity_descriptor &entity,
+                                                  c_api::component_pointer *&pointer,
+                                                  c_api::tuple *args,
+                                                  size_t argsSizeBytes);
+
+        c_api::get_component_error get_component(const c_api::entity_descriptor &entity,
+                                                 c_api::component_pointer *&pointer);
+
     private:
         using constructor_type = std::function<void(void *pAllocatedMemory,
                                                     size_t allocatedSize,
-                                                    const c_api::tuple &args,
+                                                    const c_api::tuple *args,
                                                     size_t argsSizeBytes)>;
 
         using destructor_type = std::function<void(void *pObject, size_t objectSize)>;
 
         static constructor_type make_constructor(const c_api::storage_params &params);
         static destructor_type make_destructor(const c_api::storage_params &params);
+
+        std::optional<void*> find_component(const c_api::entity_descriptor &entity);
 
     private:
         const component_id componentId_;

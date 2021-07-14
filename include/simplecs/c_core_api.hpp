@@ -65,7 +65,7 @@ namespace eld::c_api
         size_t componentSize;
         void (*pInPlaceConstruct)(void *pAllocatedMemory,
                                      size_t allocatedSize,
-                                     const tuple &args,
+                                     const tuple *args,
                                      size_t argsSizeBytes);
 
         void (*pInPlaceDestroy)(void *pObject, size_t objectSize);
@@ -93,7 +93,8 @@ namespace eld::c_api
     enum class allocate_component_error : uint8_t
     {
         success = 0,
-        already_exists
+        already_exists,
+        invalid_constructor
     };
 
     enum class deallocate_component_error : uint8_t
@@ -104,7 +105,8 @@ namespace eld::c_api
 
     enum class get_component_error : uint8_t
     {
-        success = 0
+        success = 0,
+        invalid_entity
     };
 
     extern "C"
@@ -191,7 +193,7 @@ namespace eld::c_api
             construct_component(const entity_descriptor &entity,
                                 const component_descriptor &component,
                                 component_pointer *&pointer,
-                                tuple *args,
+                                const tuple *args,
                                 size_t argsSizeBytes);
 
         SIMPLECS_DECL deallocate_component_error

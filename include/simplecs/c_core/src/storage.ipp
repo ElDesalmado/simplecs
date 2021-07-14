@@ -2,6 +2,8 @@
 
 #include "simplecs/c_core/storage.hpp"
 
+#include <new>
+
 namespace eld
 {
     namespace c_core
@@ -63,8 +65,8 @@ namespace eld
             const c_api::entity_descriptor &entity,
             c_api::component_pointer *&pointer)
         {
-            auto found = components_.find(entity);
-            if (found != components_.cend())
+            auto optionalFound = find_component(entity);
+            if (!optionalFound)
                 return c_api::allocate_component_error::already_exists;
 
             void *pAllocatedMemory = operator new(componentSize_);
@@ -79,11 +81,11 @@ namespace eld
             const c_api::entity_descriptor &entity,
             c_api::component_pointer *&pointer)
         {
-            auto found = components_.find(entity);
-            if (found != components_.cend())
+            auto optionalFound = find_component(entity);
+            if (!optionalFound)
                 return c_api::deallocate_component_error::invalid_entity;
 
-            void *pObject = reinterpret_cast<void *>(found->second);
+            void *pObject = *optionalFound;
 
             if (pInPlaceDestructor_)
                 pInPlaceDestructor_(pObject, componentSize_);
@@ -92,6 +94,48 @@ namespace eld
             *pointer = {};
 
             return c_api::deallocate_component_error::success;
+        }
+
+        c_api::allocate_component_error component_storage::construct(
+            const c_api::entity_descriptor &entity,
+            c_api::component_pointer *&pointer,
+            c_api::tuple *args,
+            size_t argsSizeBytes)
+        {
+            if (!pInPlaceConstructor_)
+                return c_api::allocate_component_error::invalid_constructor;
+
+            auto res = allocate(entity, pointer);
+            if ((bool)res)
+                return res;
+
+            pInPlaceConstructor_(pointer->pObject, componentSize_, args, argsSizeBytes);
+            return c_api::allocate_component_error::success;
+        }
+
+        std::optional<void *> component_storage::find_component(
+            const c_api::entity_descriptor &entity)
+        {
+            auto found = components_.find(entity);
+            if (found != components_.cend())
+                return std::nullopt;
+
+            return reinterpret_cast<void *>(found->second);
+        }
+
+        c_api::get_component_error component_storage::get_component(
+            const c_api::entity_descriptor &entity,
+            c_api::component_pointer *&pointer)
+        {
+            auto optionalFound = find_component(entity);
+            if (!optionalFound)
+                return c_api::get_component_error::invalid_entity;
+
+            pointer->pObject = *optionalFound;
+            pointer->componentSize = componentSize_;
+            pointer->componentDescriptor.id = componentId_;
+
+            return c_api::get_component_error::success;
         }
 
     }   // namespace c_core
@@ -122,7 +166,7 @@ namespace eld
         allocate_component_error construct_component(const entity_descriptor &entity,
                                                      const component_descriptor &component,
                                                      component_pointer *&pointer,
-                                                     tuple *args,
+                                                     const tuple *args,
                                                      size_t argsSizeBytes)
         {
             // TODO: implement
