@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "simplesc/c_registry_api.h"
+#include "simplecs/c_core_api.hpp"
 
-#include "simplesc/generic/selector.h"
-#include "simplesc/impl/selector.h"
+#include "simplecs/generic/selector.h"
+#include "simplecs/impl/selector.h"
 
 #include <cassert>
 #include <iterator>

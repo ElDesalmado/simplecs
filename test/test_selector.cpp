@@ -1,6 +1,6 @@
 ﻿
-#include "simplesc/generic/selector.h"
-#include "simplesc/impl/selector.h"
+#include "simplecs/generic/selector.h"
+#include "simplecs/impl/selector.h"
 
 #include <gtest/gtest.h>
 

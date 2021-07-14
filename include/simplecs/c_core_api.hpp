@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplesc/config.hpp"
+#include "simplecs/config.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -227,5 +227,5 @@ namespace eld::c_api
 }   // namespace eld::c_api
 
 #ifdef SIMPLECS_HEADER_ONLY
-#    include "simplesc/src/c_registry.ipp"
+#    include "simplecs/src/c_registry.ipp"
 #endif

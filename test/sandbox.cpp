@@ -1,6 +1,6 @@
 ﻿
-#include "simplesc/registry.h"
-#include "simplesc/c_registry_api.h"
+#include "simplecs/c_core_api.hpp"
+#include "simplecs/registry.h"
 
 #include <cstdint>
 

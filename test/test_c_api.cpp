@@ -1,5 +1,5 @@
 ﻿
-#include "simplesc/c_registry_api.h"
+#include "simplecs/c_core_api.hpp"
 
 #include <gtest/gtest.h>
 
