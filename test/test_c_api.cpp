@@ -27,18 +27,18 @@ TEST(c_api_registry, selec_entities)
 
     using namespace eld::c_api;
 
-    std::vector<component_id> componentsEntity0{ component_id{ 0 },   //
-                                              component_id{ 1 },   //
-                                              component_id{ 2 },   //
-                                              component_id{ 3 },   //
-                                              component_id{ 4 },   //
-                                              component_id{ 5 } },
-        componentsEntity1{ component_id{ 2 },   //
-                           component_id{ 3 },
-                           component_id{ 5 },
-                           component_id{ 6 } };
+    std::vector<component_descriptor> componentsEntity0{ component_descriptor{ 0 },   //
+                                              component_descriptor{ 1 },   //
+                                              component_descriptor{ 2 },   //
+                                              component_descriptor{ 3 },   //
+                                              component_descriptor{ 4 },   //
+                                              component_descriptor{ 5 } },
+        componentsEntity1{ component_descriptor{ 2 },   //
+                           component_descriptor{ 3 },
+                           component_descriptor{ 5 },
+                           component_descriptor{ 6 } };
 
-    entity entity0{ 0 },   //
+    entity_descriptor entity0{ 0 },   //
         entity1{ 1 };
 
     std::vector<reg_error> regResultExpected(componentsEntity0.size(), reg_error::success),
@@ -63,10 +63,10 @@ TEST(c_api_registry, selec_entities)
 
     entity_selection entitySelection{};
 
-    std::vector<component_id> selectComponents{
-        component_id{2},
-        component_id{3},
-        component_id{5}
+    std::vector<component_descriptor> selectComponents{
+        component_descriptor{2},
+        component_descriptor{3},
+        component_descriptor{5}
     };
 
     select_entities_by_components(selectComponents.data(),

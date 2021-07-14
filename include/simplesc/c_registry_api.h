@@ -12,21 +12,14 @@ namespace eld::c_api
     /**
      * Handle type for Entity
      */
-    struct entity
+    struct entity_descriptor
     {
         size_t id;
     };
 
-    struct component_id
+    struct component_descriptor
     {
         size_t id;
-    };
-
-    struct component_pointer
-    {
-        component_id component_id;
-        void *p_object;
-        size_t component_size;
     };
 
     /**
@@ -35,7 +28,7 @@ namespace eld::c_api
     struct entity_selection
     {
         size_t handle;
-        const entity *array;
+        const entity_descriptor *array;
         size_t length;
     };
 
@@ -54,28 +47,48 @@ namespace eld::c_api
 
     constexpr size_t invalid_id = std::numeric_limits<size_t>::max();
 
-    enum class entity_allocation_error : uint8_t 
+    enum class entity_allocation_error : uint8_t
     {
         success = 0
     };
 
-    struct component_storage_descr
+    struct component_storage_descriptor
     {
-        component_id component;
+        component_descriptor component_descriptor;
         size_t component_size;
-
     };
 
     struct storage_params
     {
+        size_t component_size;
+        void (*p_in_place_construct)(void *pAllocatedMemory, size_t allocatedSize);
+        void (*p_in_place_destroy)(void *pObject, size_t objectSize);
+        void *p_constructor_callable;
+        void *p_destructor_callable;
+    };
 
+    struct component_pointer
+    {
+        component_descriptor component_descriptor;
+        void *p_object;
+        size_t component_size;
+    };
+
+    enum class allocation_component_storage_error : uint8_t
+    {
+        success = 0
+    };
+
+    enum class release_component_storage_error : uint8_t
+    {
+        success = 0
     };
 
     extern "C"
     {
         /**
          * Functionality:
-         * 1. Lookup table.
+         * 1. Relational table.
          *      Description: Maps entities and components.
          *      - select entities with set of given components
          *      - enumerate components for given entity
@@ -85,7 +98,8 @@ namespace eld::c_api
          * 2. Component storage:
          *      Description: Manages memory allocation for distinct components.
          *      - allocate storage
-         *      - allocate RAII storage (must provide Component's in-place constructor and in-place destructor)
+         *      - allocate RAII storage (must provide Component's in-place constructor and in-place
+         * destructor)
          *      - allocate component for entity
          *      - destroy component component for entity
          *      - deallocate storage
@@ -98,50 +112,72 @@ namespace eld::c_api
          *      - release. Clears all the resources. Destroys components within the RAII storage.
          */
 
-        SIMPLECS_DECL void register_components(const entity &,
-                                               const component_id *array,
+        SIMPLECS_DECL void register_components(const entity_descriptor &,
+                                               const component_descriptor *array,
                                                size_t length,
                                                reg_error *results);
 
-        SIMPLECS_DECL void unregister_components(const entity &,
-                                                 const component_id *array,
+        SIMPLECS_DECL void unregister_components(const entity_descriptor &,
+                                                 const component_descriptor *array,
                                                  size_t length,
                                                  unreg_error *results);
 
-        SIMPLECS_DECL void select_entities_by_components(const component_id *array,
+        SIMPLECS_DECL void select_entities_by_components(const component_descriptor *array,
                                                          size_t length,
                                                          entity_selection &result);
         SIMPLECS_DECL void free_entity_selection(entity_selection &);
 
-        SIMPLECS_DECL void allocate_entities(entity *& array,
+        /**
+         * Allocates entities within the Entity Storage
+         * @param array input array of entity descriptors.
+         * @param length Length of the input array
+         * @param results Array of errors.
+         */
+        SIMPLECS_DECL void allocate_entities(entity_descriptor *&array,
                                              size_t length,
                                              entity_allocation_error *&results);
 
-        SIMPLECS_DECL void deallocate_entities(entity *& array,
+        /**
+         * Deallocates entities within the Entity Storage
+         * @param array input array of entity descriptors.
+         * @param length Length of the input array
+         * @param results Array of errors.
+         */
+        SIMPLECS_DECL void deallocate_entities(entity_descriptor *&array,
                                                size_t length,
                                                entity_allocation_error *&results);
 
-        SIMPLECS_DECL void init_component_storage();
-        SIMPLECS_DECL void deinit_component_storage();
-        
+        /**
+         * Initialize a storage for a component. Assigns new id for the component.
+         * @param outputDescriptor Component storage descriptor for .
+         * @param inputParams
+         */
+        SIMPLECS_DECL allocation_component_storage_error
+            init_component_storage(component_storage_descriptor &outputDescriptor,
+                                   const storage_params &inputParams);
+
+        SIMPLECS_DECL release_component_storage_error
+            release_component_storage(component_storage_descriptor &storageDescriptor);
     }
 
-    constexpr inline bool operator<(const entity &lhs, const entity &rhs)
+    constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)
     {
         return lhs.id < rhs.id;
     }
 
-    constexpr inline bool operator==(const entity &lhs, const entity &rhs)
+    constexpr inline bool operator==(const entity_descriptor &lhs, const entity_descriptor &rhs)
     {
         return !(lhs < rhs) && !(rhs < lhs);
     }
 
-    constexpr inline bool operator<(const component_id &lhs, const component_id &rhs)
+    constexpr inline bool operator<(const component_descriptor &lhs,
+                                    const component_descriptor &rhs)
     {
         return lhs.id < rhs.id;
     }
 
-    constexpr inline bool operator==(const component_id &lhs, const component_id &rhs)
+    constexpr inline bool operator==(const component_descriptor &lhs,
+                                     const component_descriptor &rhs)
     {
         return !(lhs < rhs) && !(rhs < lhs);
     }
