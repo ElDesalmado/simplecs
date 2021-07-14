@@ -26,7 +26,7 @@ target_compile_definitions(simplesc_shared PUBLIC SIMPLESC_SHARED)
 add_library(eld::simplesc_shared ALIAS simplesc_shared)
 
 # workaround for MinGW
-if (CMAKE_COMPILER_IS_GNUCC)
+if (WIN32 AND CMAKE_COMPILER_IS_GNUCC)
     target_link_options(simplesc_shared PRIVATE "-Wl,--exclude-all-symbols")
 endif()
 

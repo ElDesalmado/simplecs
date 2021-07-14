@@ -18,5 +18,13 @@
 #                define SIMPLESC_DECL __declspec(dllimport)
 #            endif
 #        endif
+#    elif defined(__GNUC__)
+#        if defined(SIMPLESC_SHARED)
+#            if defined(SIMPLESC_SOURCE)
+#                define SIMPLESC_DECL __attribute__((visibility("default")))
+#            else
+#                define SIMPLESC_DECL /*__attribute__((visibility ("default")))*/
+#            endif
+#        endif
 #    endif
 #endif

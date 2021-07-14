@@ -12,7 +12,7 @@ struct traits
 class dummy_impl
 {
 public:
-    using traits = traits;
+    using traits = ::traits;
 
     constexpr traits::entity_type create_entity()
     {
@@ -29,7 +29,7 @@ int main()
 {
     struct with_traits
     {
-        using traits [[maybe_unused]] = traits;
+        using traits [[maybe_unused]] = ::traits;
     };
 
     eld::generic::registry<dummy_impl> dummyRegistry{};
