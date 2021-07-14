@@ -27,16 +27,16 @@ TEST(c_api_registry, selec_entities)
 
     using namespace eld::c_api;
 
-    std::vector<component> componentsEntity0{ component{ 0 },   //
-                                              component{ 1 },   //
-                                              component{ 2 },   //
-                                              component{ 3 },   //
-                                              component{ 4 },   //
-                                              component{ 5 } },
-        componentsEntity1{ component{ 2 },   //
-                           component{ 3 },
-                           component{ 5 },
-                           component{ 6 } };
+    std::vector<component_id> componentsEntity0{ component_id{ 0 },   //
+                                              component_id{ 1 },   //
+                                              component_id{ 2 },   //
+                                              component_id{ 3 },   //
+                                              component_id{ 4 },   //
+                                              component_id{ 5 } },
+        componentsEntity1{ component_id{ 2 },   //
+                           component_id{ 3 },
+                           component_id{ 5 },
+                           component_id{ 6 } };
 
     entity entity0{ 0 },   //
         entity1{ 1 };
@@ -63,10 +63,10 @@ TEST(c_api_registry, selec_entities)
 
     entity_selection entitySelection{};
 
-    std::vector<component> selectComponents{
-        component{2},
-        component{3},
-        component{5}
+    std::vector<component_id> selectComponents{
+        component_id{2},
+        component_id{3},
+        component_id{5}
     };
 
     select_entities_by_components(selectComponents.data(),
