@@ -82,31 +82,37 @@ namespace eld::c_api
 
     enum class allocation_component_storage_error : uint8_t
     {
-        success = 0
+        success = 0,
+        invalid_component_size
     };
 
     enum class release_component_storage_error : uint8_t
     {
-        success = 0
+        success = 0,
+        invalid_component_descriptor
     };
 
     enum class allocate_component_error : uint8_t
     {
         success = 0,
         already_exists,
-        invalid_constructor
+        invalid_constructor,
+        invalid_component_descriptor,
+        invalid_entity
     };
 
     enum class deallocate_component_error : uint8_t
     {
         success = 0,
-        invalid_entity
+        invalid_component_descriptor,
+        invalid_entity,
     };
 
     enum class get_component_error : uint8_t
     {
         success = 0,
-        invalid_entity
+        invalid_entity,
+        invalid_component_id,
     };
 
     extern "C"
