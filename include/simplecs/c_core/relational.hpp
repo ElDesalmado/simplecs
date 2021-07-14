@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <stack>
 
 namespace std
 {
@@ -26,23 +27,14 @@ namespace eld::c_core
     class entity_selection
     {
     public:
-        explicit entity_selection(std::vector<c_api::entity_descriptor> &&selection)
-          : selection_(std::move(selection))
-        {
-        }
+        explicit entity_selection(std::vector<c_api::entity_descriptor> &&selection);
 
         entity_selection(entity_selection &&) = default;
         entity_selection &operator=(entity_selection &&) = default;
 
-        [[nodiscard]] auto data() const -> const c_api::entity_descriptor*
-        {
-            return selection_.data();
-        }
+        [[nodiscard]] auto data() const -> const c_api::entity_descriptor*;
 
-        [[nodiscard]] size_t size() const
-        {
-            return selection_.size();
-        }
+        [[nodiscard]] size_t size() const;
 
     private:
         std::vector<c_api::entity_descriptor> selection_;
@@ -99,15 +91,17 @@ namespace eld::c_core
         void free(c_api::entity_selection &selection);
 
     private:
-        size_t get_next_id();
+        using selection_id = size_t;
+
+        selection_id next_available_id();
 
     private:
 
         static selections instance_;
 
         std::unordered_map<size_t, entity_selection> selections_;
-        size_t selectionsCounter_ = 0,   //
-        freedSelection_ = 0;
+        selection_id selectionsCounter_ = 0;
+        std::stack<size_t> freedSelections_;
     };
 
 }   // namespace eld::c_core

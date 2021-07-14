@@ -10,6 +10,20 @@ namespace eld
 {
     namespace c_core
     {
+        entity_selection::entity_selection(std::vector<c_api::entity_descriptor> &&selection)
+            : selection_(std::move(selection))
+        {
+        }
+
+        auto entity_selection::data() const -> const c_api::entity_descriptor *
+        {
+            return selection_.data();
+        }
+
+        size_t entity_selection::size() const {
+            return selection_.size();
+        }
+
         relational_table relational_table::instance_ = {};
         relational_table &relational_table::instance() { return relational_table::instance_; }
 
@@ -97,7 +111,7 @@ namespace eld
 
         c_api::entity_selection selections::store(entity_selection &&selection)
         {
-            const auto id = get_next_id();
+            const auto id = next_available_id();
 
             c_api::entity_selection out{ id, selection.data(), selection.size() };
 
@@ -110,20 +124,21 @@ namespace eld
 
         void selections::free(c_api::entity_selection &selection)
         {
+            // TODO: decrease counter or add id to stack of freed ids
             selections_.erase(selection.handle);
             selection.array = nullptr;
             selection.length = 0;
             selection.handle = c_api::invalid_id;
         }
 
-        size_t selections::get_next_id()
+        selections::selection_id selections::next_available_id()
         {
-            if (!freedSelection_)
+            if (freedSelections_.empty())
                 return selectionsCounter_++;
 
-            auto temp = freedSelection_;
-            freedSelection_ = 0;
-            return temp;
+            const auto id = freedSelections_.top();
+            freedSelections_.pop();
+            return id;
         }
 
     }   // namespace c_core

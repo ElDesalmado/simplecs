@@ -202,6 +202,7 @@ namespace eld
         c_api::release_component_storage_error storages::release(
             c_api::component_storage_descriptor &storageDescriptor)
         {
+            // TODO: decrease counter or add id to stack of freed ids
             auto found = map_.find(storageDescriptor.componentDescriptor.id);
             if (found == map_.cend())
                 return c_api::release_component_storage_error::invalid_component_descriptor;
@@ -209,7 +210,6 @@ namespace eld
             map_.erase(found);
             return c_api::release_component_storage_error::success;
         }
-
     }   // namespace c_core
 
     namespace c_api
