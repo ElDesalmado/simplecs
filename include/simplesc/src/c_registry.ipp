@@ -50,7 +50,7 @@ namespace eld
         void register_components(const c_api::entity &owningEntity,
                                  const c_api::component_id *componentArray,
                                  size_t length,
-                                 c_api::reg_result *resArray)
+                                 c_api::reg_error *resArray)
         {
             for (size_t i = 0; i != length; ++i)
             {
@@ -60,31 +60,31 @@ namespace eld
             }
         }
 
-        c_api::reg_result register_component(const c_api::entity &owningEntity,
+        c_api::reg_error register_component(const c_api::entity &owningEntity,
                                 const c_api::component_id &component)
         {
             auto optionalColumn = get_column(component);
             if (!optionalColumn)
             {
                 componentsTable_.emplace(std::make_pair(component, std::vector{ owningEntity }));
-                return c_api::reg_result::success;
+                return c_api::reg_error::success;
             }
 
             component_column &column = *optionalColumn;
             auto iter = std::find(column.cbegin(), column.cend(), owningEntity);
             if (iter != column.cend())
-                return c_api::reg_result::component_already_registered;
+                return c_api::reg_error::component_already_registered;
 
             column.push_back(owningEntity);
             std::sort(column.begin(), column.end());
 
-            return c_api::reg_result::success;
+            return c_api::reg_error::success;
         }
 
         void unregister_components(const c_api::entity &owningEntity,
                                    const c_api::component_id *componentArray,
                                    size_t length,
-                                   c_api::unreg_result *resArray)
+                                   c_api::unreg_error *resArray)
         {
             for (size_t i = 0; i != length; ++i)
             {
@@ -94,21 +94,21 @@ namespace eld
             }
         }
 
-        c_api::unreg_result unregister_component(const c_api::entity &owningEntity,
+        c_api::unreg_error unregister_component(const c_api::entity &owningEntity,
                                   const c_api::component_id &component)
         {
             auto optionalColumn = get_column(component);
             if (!optionalColumn)
-                return c_api::unreg_result::component_not_found;
+                return c_api::unreg_error::component_not_found;
 
             component_column &column = *optionalColumn;
 
             auto iter = std::find(column.cbegin(), column.cend(), owningEntity);
             if (iter == column.cend())
-                return c_api::unreg_result::component_not_registered;
+                return c_api::unreg_error::component_not_registered;
 
             column.erase(iter);
-            return c_api::unreg_result::success;
+            return c_api::unreg_error::success;
         }
 
         c_api::entity_selection select(const std::vector<c_api::component_id> &selectComponents)
@@ -176,7 +176,7 @@ namespace eld
         void register_components(const entity &owningEntity,
                                  const component_id *array,
                                  size_t length,
-                                 reg_result *results)
+                                 reg_error *results)
         {
             if (!array ||   //
                 !length)
@@ -188,7 +188,7 @@ namespace eld
         void unregister_components(const entity &owningEntity,
                                    const component_id *array,
                                    size_t length,
-                                   unreg_result *results)
+                                   unreg_error *results)
         {
             if (!array ||   //
                 !length)
@@ -209,6 +209,16 @@ namespace eld
         void free_entity_selection(entity_selection &selection)
         {
             components_table::instance().free(selection);
+        }
+
+        void allocate_entities(entity *&array, size_t length, entity_allocation_error *&results)
+        {
+            // TODO: implement
+        }
+
+        void deallocate_entities(entity *&array, size_t length, entity_allocation_error *&results)
+        {
+            // TODO: implement
         }
 
     }   // namespace c_api
