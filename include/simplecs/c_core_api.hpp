@@ -92,12 +92,14 @@ namespace eld::c_api
 
     enum class allocate_component_error : uint8_t
     {
-        success = 0
+        success = 0,
+        already_exists
     };
 
     enum class deallocate_component_error : uint8_t
     {
-        success = 0
+        success = 0,
+        invalid_entity
     };
 
     enum class get_component_error : uint8_t
