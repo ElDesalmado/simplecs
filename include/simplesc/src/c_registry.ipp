@@ -272,6 +272,14 @@ namespace eld
             return deallocate_component_error::success;
         }
 
+        get_component_error get_component(const entity_descriptor &entity,
+                                          const component_descriptor &componentDescriptor,
+                                          component_pointer *&pointer)
+        {
+            // TODO: implement
+            return get_component_error::success;
+        }
+
     }   // namespace c_api
 
 }   // namespace eld

@@ -100,6 +100,11 @@ namespace eld::c_api
         success = 0
     };
 
+    enum class get_component_error : uint8_t
+    {
+        success = 0
+    };
+
     extern "C"
     {
         /**
@@ -189,6 +194,12 @@ namespace eld::c_api
 
         SIMPLECS_DECL deallocate_component_error
             deallocate_component(const entity_descriptor &entity, component_pointer *&pointer);
+
+        SIMPLECS_DECL get_component_error get_component(const entity_descriptor &entity,
+                                                        const component_descriptor& componentDescriptor,
+                                                        component_pointer*& pointer);
+
+
     }
 
     constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)
