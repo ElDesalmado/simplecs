@@ -1,10 +1,11 @@
 ﻿#pragma once
 
-#include "simplecs/c_core_api.hpp"
 #include "simplecs/config.hpp"
+#include "simplecs/c_core_api.hpp"
 
 namespace eld::c_core
 {
+
 }
 
 #ifdef SIMPLECS_HEADER_ONLY
