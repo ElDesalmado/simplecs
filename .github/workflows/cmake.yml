@@ -24,7 +24,7 @@ jobs:
         run: sudo apt-get install ninja-build
 
       - name: Install gtest
-        run: sudo apt-get install googletest && cd /usr/src/googletest && mkdir build && cd build && cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . --target install
+        run: sudo apt-get install googletest && cd /usr/src/googletest && sudo mkdir build && cd build && sudo cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release && sudo cmake --build . --target install
 
       - uses: actions/checkout@v2
 
