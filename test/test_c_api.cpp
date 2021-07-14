@@ -21,10 +21,12 @@ TEST(c_api_registry, unreg_components)
     FAIL();
 }
 
+/**
+ * 1. Register components for several entities
+ * 2. Select all entities with a set of components
+ */
 TEST(c_api_registry, selec_entities)
 {
-    // TODO: implement
-
     using namespace eld::c_api;
 
     std::vector<component_descriptor> componentsEntity0{ component_descriptor{ 0 },   //

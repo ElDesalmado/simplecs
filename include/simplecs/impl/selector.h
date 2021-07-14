@@ -58,6 +58,7 @@ namespace eld::impl
                                       std::back_inserter(currentSet));
 
                 std::swap(out, currentSet);
+                currentSet.clear();
             }
 
             return out;
