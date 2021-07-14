@@ -54,30 +54,30 @@ namespace eld::c_api
 
     struct component_storage_descriptor
     {
-        component_descriptor component_descriptor;
-        size_t component_size;
+        component_descriptor componentDescriptor;
+        size_t componentSize;
     };
 
     struct tuple;
 
     struct storage_params
     {
-        size_t component_size;
-        void (*p_in_place_construct)(void *pAllocatedMemory,
+        size_t componentSize;
+        void (*pInPlaceConstruct)(void *pAllocatedMemory,
                                      size_t allocatedSize,
                                      const tuple &args,
                                      size_t argsSizeBytes);
 
-        void (*p_in_place_destroy)(void *pObject, size_t objectSize);
-        void *p_constructor_callable;
-        void *p_destructor_callable;
+        void (*pInPlaceDestroy)(void *pObject, size_t objectSize);
+        void *pConstructorCallable;
+        void *pDestructorCallable;
     };
 
     struct component_pointer
     {
-        component_descriptor component_descriptor;
-        void *p_object;
-        size_t component_size;
+        component_descriptor componentDescriptor;
+        void *pObject;
+        size_t componentSize;
     };
 
     enum class allocation_component_storage_error : uint8_t
