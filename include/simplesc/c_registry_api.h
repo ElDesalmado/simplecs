@@ -17,10 +17,7 @@ namespace eld::c_api
         size_t id;
     };
 
-    /**
-     * Handle type for Component
-     */
-    struct component
+    struct component_id
     {
         size_t id;
     };
@@ -52,20 +49,20 @@ namespace eld::c_api
 
     extern "C"
     {
-        SIMPLESC_DECL void register_components(const entity &,
-                                               const component *array,
+        SIMPLECS_DECL void register_components(const entity &,
+                                               const component_id *array,
                                                size_t length,
                                                reg_result *results);
 
-        SIMPLESC_DECL void unregister_components(const entity &,
-                                                 const component *array,
+        SIMPLECS_DECL void unregister_components(const entity &,
+                                                 const component_id *array,
                                                  size_t length,
                                                  unreg_result *results);
 
-        SIMPLESC_DECL void select_entities_by_components(const component *array,
+        SIMPLECS_DECL void select_entities_by_components(const component_id *array,
                                                          size_t length,
                                                          entity_selection &result);
-        SIMPLESC_DECL void free_entity_selection(entity_selection &);
+        SIMPLECS_DECL void free_entity_selection(entity_selection &);
     }
 
     constexpr inline bool operator<(const entity &lhs, const entity &rhs)
@@ -78,18 +75,18 @@ namespace eld::c_api
         return !(lhs < rhs) && !(rhs < lhs);
     }
 
-    constexpr inline bool operator<(const component &lhs, const component &rhs)
+    constexpr inline bool operator<(const component_id &lhs, const component_id &rhs)
     {
         return lhs.id < rhs.id;
     }
 
-    constexpr inline bool operator==(const component &lhs, const component &rhs)
+    constexpr inline bool operator==(const component_id &lhs, const component_id &rhs)
     {
         return !(lhs < rhs) && !(rhs < lhs);
     }
 
 }   // namespace eld::c_api
 
-#ifdef SIMPLESC_HEADER_ONLY
+#ifdef SIMPLECS_HEADER_ONLY
 #    include "simplesc/src/c_registry.ipp"
 #endif

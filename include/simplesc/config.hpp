@@ -1,29 +1,29 @@
 ﻿#pragma once
 
-#if !defined(SIMPLESC_HEADER_ONLY)
-#    if !defined(SIMPLESC_SHARED)
-#        define SIMPLESC_HEADER_ONLY
+#if !defined(SIMPLECS_HEADER_ONLY)
+#    if !defined(SIMPLECS_SHARED)
+#        define SIMPLECS_HEADER_ONLY
 #    endif
 #endif
 
-// TODO: fix SIMPLESC_DECL to export symbols with GCC on Ubuntu
-#if defined(SIMPLESC_HEADER_ONLY)
-#    define SIMPLESC_DECL inline
+// TODO: fix SIMPLECS_DECL to export symbols with GCC on Ubuntu
+#if defined(SIMPLECS_HEADER_ONLY)
+#    define SIMPLECS_DECL inline
 #else
 #    if defined(__WIN32) || defined(_MSC_VER) || defined(__BORLANDC__) || defined(__CODEGEARC__)
-#        if defined(SIMPLESC_SHARED)
-#            if defined(SIMPLESC_SOURCE)
-#                define SIMPLESC_DECL __declspec(dllexport)
+#        if defined(SIMPLECS_SHARED)
+#            if defined(SIMPLECS_SOURCE)
+#                define SIMPLECS_DECL __declspec(dllexport)
 #            else
-#                define SIMPLESC_DECL __declspec(dllimport)
+#                define SIMPLECS_DECL __declspec(dllimport)
 #            endif
 #        endif
 #    elif defined(__GNUC__)
-#        if defined(SIMPLESC_SHARED)
-#            if defined(SIMPLESC_SOURCE)
-#                define SIMPLESC_DECL __attribute__((visibility("default")))
+#        if defined(SIMPLECS_SHARED)
+#            if defined(SIMPLECS_SOURCE)
+#                define SIMPLECS_DECL __attribute__((visibility("default")))
 #            else
-#                define SIMPLESC_DECL /*__attribute__((visibility ("default")))*/
+#                define SIMPLECS_DECL /*__attribute__((visibility ("default")))*/
 #            endif
 #        endif
 #    endif

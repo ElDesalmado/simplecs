@@ -13,9 +13,9 @@
 namespace std
 {
     template<>
-    struct hash<eld::c_api::component>
+    struct hash<eld::c_api::component_id>
     {
-        size_t operator()(const eld::c_api::component &component) const noexcept
+        size_t operator()(const eld::c_api::component_id &component) const noexcept
         {
             return hash<size_t>()(component.id);
         }
@@ -48,7 +48,7 @@ namespace eld
         static components_table &instance() { return components_table::instance_; }
 
         void register_components(const c_api::entity &owningEntity,
-                                 const c_api::component *componentArray,
+                                 const c_api::component_id *componentArray,
                                  size_t length,
                                  c_api::reg_result *resArray)
         {
@@ -61,7 +61,7 @@ namespace eld
         }
 
         c_api::reg_result register_component(const c_api::entity &owningEntity,
-                                const c_api::component &component)
+                                const c_api::component_id &component)
         {
             auto optionalColumn = get_column(component);
             if (!optionalColumn)
@@ -82,7 +82,7 @@ namespace eld
         }
 
         void unregister_components(const c_api::entity &owningEntity,
-                                   const c_api::component *componentArray,
+                                   const c_api::component_id *componentArray,
                                    size_t length,
                                    c_api::unreg_result *resArray)
         {
@@ -95,7 +95,7 @@ namespace eld
         }
 
         c_api::unreg_result unregister_component(const c_api::entity &owningEntity,
-                                  const c_api::component &component)
+                                  const c_api::component_id &component)
         {
             auto optionalColumn = get_column(component);
             if (!optionalColumn)
@@ -111,7 +111,7 @@ namespace eld
             return c_api::unreg_result::success;
         }
 
-        c_api::entity_selection select(const std::vector<c_api::component> &selectComponents)
+        c_api::entity_selection select(const std::vector<c_api::component_id> &selectComponents)
         {
             auto selected = selector_(componentsTable_, selectComponents);
             const auto id = get_next_id();
@@ -146,7 +146,7 @@ namespace eld
             return temp;
         }
 
-        auto get_column(const c_api::component &component)
+        auto get_column(const c_api::component_id &component)
             -> std::optional<std::reference_wrapper<component_column>>
         {
             auto found = componentsTable_.find(component);
@@ -159,9 +159,9 @@ namespace eld
     private:
         static components_table instance_;
 
-        eld::generic::selector<eld::impl::selector_std<c_api::entity, c_api::component>> selector_;
+        eld::generic::selector<eld::impl::selector_std<c_api::entity, c_api::component_id>> selector_;
 
-        std::unordered_map<c_api::component, component_column> componentsTable_;
+        std::unordered_map<c_api::component_id, component_column> componentsTable_;
 
         // TODO: standalone class
         std::unordered_map<size_t, entity_selection> selections_;
@@ -174,7 +174,7 @@ namespace eld
     namespace c_api
     {
         void register_components(const entity &owningEntity,
-                                 const component *array,
+                                 const component_id *array,
                                  size_t length,
                                  reg_result *results)
         {
@@ -186,7 +186,7 @@ namespace eld
         }
 
         void unregister_components(const entity &owningEntity,
-                                   const component *array,
+                                   const component_id *array,
                                    size_t length,
                                    unreg_result *results)
         {
@@ -197,13 +197,13 @@ namespace eld
             components_table::instance().unregister_components(owningEntity, array, length, results);
         }
 
-        void select_entities_by_components(const component *array,
+        void select_entities_by_components(const component_id *array,
                                            size_t length,
                                            entity_selection &result)
         {
             using difference_type = std::iterator_traits<decltype(array)>::difference_type;
             result = components_table::instance().select(
-                std::vector<component>(array, std::next(array, difference_type(length))));
+                std::vector<component_id>(array, std::next(array, difference_type(length))));
         }
 
         void free_entity_selection(entity_selection &selection)
