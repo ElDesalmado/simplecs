@@ -58,10 +58,16 @@ namespace eld::c_api
         size_t component_size;
     };
 
+    struct tuple;
+
     struct storage_params
     {
         size_t component_size;
-        void (*p_in_place_construct)(void *pAllocatedMemory, size_t allocatedSize);
+        void (*p_in_place_construct)(void *pAllocatedMemory,
+                                     size_t allocatedSize,
+                                     const tuple &args,
+                                     size_t argsSizeBytes);
+
         void (*p_in_place_destroy)(void *pObject, size_t objectSize);
         void *p_constructor_callable;
         void *p_destructor_callable;
@@ -80,6 +86,16 @@ namespace eld::c_api
     };
 
     enum class release_component_storage_error : uint8_t
+    {
+        success = 0
+    };
+
+    enum class allocate_component_error : uint8_t
+    {
+        success = 0
+    };
+
+    enum class deallocate_component_error : uint8_t
     {
         success = 0
     };
@@ -158,6 +174,21 @@ namespace eld::c_api
 
         SIMPLECS_DECL release_component_storage_error
             release_component_storage(component_storage_descriptor &storageDescriptor);
+
+        SIMPLECS_DECL allocate_component_error
+            allocate_component(const entity_descriptor &entity,
+                               const component_descriptor &componentDescriptor,
+                               component_pointer *&pointer);
+
+        SIMPLECS_DECL allocate_component_error
+            construct_component(const entity_descriptor &entity,
+                                const component_descriptor &component,
+                                component_pointer *&pointer,
+                                tuple *args,
+                                size_t argsSizeBytes);
+
+        SIMPLECS_DECL deallocate_component_error
+            deallocate_component(const entity_descriptor &entity, component_pointer *&pointer);
     }
 
     constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)
