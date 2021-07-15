@@ -48,13 +48,16 @@ namespace eld::impl
             auto iter = sorted.cbegin();
             result_type out = *iter,
                 currentSet{};
+            std::sort(out.begin(), out.end());
 
             while ((iter = std::next(iter)) != sorted.cend() &&
                    !std::empty(out))
             {
-                auto &column = *iter;
+                result_type column = *iter;
+                std::sort(column.begin(), column.end());
+
                 std::set_intersection(out.cbegin(), out.cend(),
-                                      column.get().cbegin(), column.get().cend(),
+                                      column.cbegin(), column.cend(),
                                       std::back_inserter(currentSet));
 
                 std::swap(out, currentSet);
