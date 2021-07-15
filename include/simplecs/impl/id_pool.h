@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <stack>
+#include <set>
+#include <cassert>
 #include <type_traits>
 
 namespace eld::detail
@@ -16,8 +18,10 @@ namespace eld::detail
             if (freed_.empty())
                 return instances_++;
 
-            const auto id = freed_.top();
-            freed_.pop();
+            auto idIter = freed_.cbegin();
+            const auto id = *idIter;
+            freed_.erase(idIter);
+
             return id;
         }
 
@@ -33,20 +37,33 @@ namespace eld::detail
             freed_.template emplace(id);
         }
 
-        bool is_free(const id_type & /*id*/)
+        bool is_free(const id_type & id)
         {
-            // TODO: implement
-            return false;
+            if (id >= instances_)
+                return true;
+
+            return freed_.find(id) != freed_.cend();
         }
 
-        bool reserve(const id_type & /*id*/)
+        bool reserve(const id_type & id)
         {
-            // TODO: implement
-            return false;
+            if (!is_free(id))
+                return false;
+
+            auto findResult = freed_.find(id);
+            if(findResult != freed_.cend())
+                freed_.erase(findResult);
+
+            for(id_type freeId = instances_; freeId < id; ++freeId)
+                freed_.emplace(freeId);
+
+            instances_ = id + 1;
+
+            return true;
         }
 
     private:
         id_type instances_;
-        std::stack<id_type> freed_;
+        std::set<id_type> freed_;
     };
 }   // namespace eld::detail
