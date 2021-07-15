@@ -4,8 +4,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <limits>
-#include <numeric>
 
 namespace eld::c_api
 {
@@ -14,12 +12,12 @@ namespace eld::c_api
      */
     struct entity_descriptor
     {
-        size_t id;
+        size_t id = -1;
     };
 
     struct component_descriptor
     {
-        size_t id;
+        size_t id = -1;
     };
 
     /**
@@ -27,7 +25,7 @@ namespace eld::c_api
      */
     struct entity_selection
     {
-        size_t handle;
+        size_t handle = -1;
         const entity_descriptor *array;
         size_t length;
     };
@@ -44,8 +42,6 @@ namespace eld::c_api
         component_not_found,
         component_not_registered
     };
-
-    constexpr size_t invalid_id = std::numeric_limits<size_t>::max();
 
     enum class entity_allocation_error : uint8_t
     {

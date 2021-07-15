@@ -111,7 +111,7 @@ namespace eld
 
         c_api::entity_selection selections::store(entity_selection &&selection)
         {
-            const auto id = next_available_id();
+            const auto id = pool_.next_available();
 
             c_api::entity_selection out{ id, selection.data(), selection.size() };
 
@@ -124,21 +124,9 @@ namespace eld
 
         void selections::free(c_api::entity_selection &selection)
         {
-            // TODO: decrease counter or add id to stack of freed ids
             selections_.erase(selection.handle);
-            selection.array = nullptr;
-            selection.length = 0;
-            selection.handle = c_api::invalid_id;
-        }
-
-        selections::selection_id selections::next_available_id()
-        {
-            if (freedSelections_.empty())
-                return selectionsCounter_++;
-
-            const auto id = freedSelections_.top();
-            freedSelections_.pop();
-            return id;
+            pool_.free(selection.handle);
+            selection = {};
         }
 
     }   // namespace c_core

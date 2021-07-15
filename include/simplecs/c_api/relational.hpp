@@ -5,10 +5,10 @@
 
 #include "simplecs/generic/selector.h"
 #include "simplecs/impl/selector.h"
+#include "simplecs/impl/id_pool.h"
 
 #include <unordered_map>
 #include <vector>
-#include <stack>
 
 namespace std
 {
@@ -93,15 +93,12 @@ namespace eld::c_core
     private:
         using selection_id = size_t;
 
-        selection_id next_available_id();
-
     private:
 
         static selections instance_;
 
         std::unordered_map<size_t, entity_selection> selections_;
-        selection_id selectionsCounter_ = 0;
-        std::stack<size_t> freedSelections_;
+        eld::detail::id_pool<selection_id> pool_;
     };
 
 }   // namespace eld::c_core
