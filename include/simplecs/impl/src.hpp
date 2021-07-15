@@ -13,3 +13,4 @@
 #include "simplecs/c_api/src/entity_storage.ipp"
 
 #include "simplecs/src/registry.ipp"
+#include "simplecs/src/components.ipp"

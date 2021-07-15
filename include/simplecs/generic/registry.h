@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <utility>
 
+// TODO: specification
+
 /**
  * C++ generic API class for registry.
  * Functions:
