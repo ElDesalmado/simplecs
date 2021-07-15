@@ -69,6 +69,7 @@ namespace eld::c_core
     {
     public:
         static storages &instance();
+        static void release();
 
         std::optional<std::reference_wrapper<component_storage>> get_storage(
             const c_api::component_descriptor &descriptor);

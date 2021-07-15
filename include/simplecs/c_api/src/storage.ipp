@@ -203,6 +203,8 @@ namespace eld
 
             return c_api::release_component_storage_error::success;
         }
+
+        void storages::release() { storages::instance_ = {}; }
     }   // namespace c_core
 
     namespace c_api

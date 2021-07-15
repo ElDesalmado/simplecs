@@ -50,20 +50,22 @@ namespace eld
                     results[i] = res;
             }
         }
+
+        void entities::release() { entities::instance_ = {}; }
     }   // namespace c_core
 
     namespace c_api
     {
-        void allocate_entities(entity_descriptor *& array,
+        void allocate_entities(entity_descriptor *&array,
                                size_t length,
-                               entity_allocation_error *& results)
+                               entity_allocation_error *&results)
         {
             c_core::entities::instance().allocate(array, length, results);
         }
 
-        void deallocate_entities(entity_descriptor *& array,
+        void deallocate_entities(entity_descriptor *&array,
                                  size_t length,
-                                 entity_allocation_error *& results)
+                                 entity_allocation_error *&results)
         {
             c_core::entities::instance().release(array, length, results);
         }

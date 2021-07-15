@@ -44,6 +44,7 @@ namespace eld::c_core
     {
     public:
         static relational_table &instance();
+        static void release();
 
         void register_components(const c_api::entity_descriptor &owningEntity,
                                  const c_api::component_descriptor *componentArray,
@@ -86,6 +87,7 @@ namespace eld::c_core
     {
     public:
         static selections& instance();
+        static void release();
 
         c_api::entity_selection store(c_core::entity_selection &&selection);
         void free(c_api::entity_selection &selection);

@@ -11,6 +11,7 @@
 #include "simplecs/c_api/src/relational.ipp"
 #include "simplecs/c_api/src/storage.ipp"
 #include "simplecs/c_api/src/entity_storage.ipp"
+#include "simplecs/c_api/src/context.ipp"
 
 #include "simplecs/src/registry.ipp"
 #include "simplecs/src/components.ipp"

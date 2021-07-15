@@ -206,6 +206,8 @@ namespace eld::c_api
             get_component(const entity_descriptor &entity,
                           const component_descriptor &componentDescriptor,
                           component_pointer *&pointer);
+
+        SIMPLECS_DECL void release_context();
     }
 
     constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)
