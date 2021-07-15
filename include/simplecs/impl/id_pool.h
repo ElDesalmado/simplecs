@@ -33,9 +33,9 @@ namespace eld::detail
             freed_.template emplace(id);
         }
 
-        bool is_free(const id_type &id) { return false; }
+        bool is_free(const id_type &/*id*/) { return false; }
 
-        bool reserve(const id_type &id) { return false; }
+        bool reserve(const id_type &/*id*/) { return false; }
 
     private:
         id_type instances_;
