@@ -52,7 +52,10 @@ namespace eld::detail
 
             auto findResult = freed_.find(id);
             if(findResult != freed_.cend())
+            {
                 freed_.erase(findResult);
+                return true;
+            }
 
             for(id_type freeId = instances_; freeId < id; ++freeId)
                 freed_.emplace(freeId);
