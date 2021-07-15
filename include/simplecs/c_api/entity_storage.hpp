@@ -10,6 +10,7 @@ namespace eld::c_core
     {
     public:
         static entities& instance();
+        static void release();
 
         c_api::entity_allocation_error allocate(c_api::entity_descriptor &descriptor);
 

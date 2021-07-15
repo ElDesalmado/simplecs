@@ -5,13 +5,14 @@
 #include <cassert>
 #include <iterator>
 #include <optional>
+#include <simplecs/c_api/c_core.hpp>
 
 namespace eld
 {
     namespace c_core
     {
         entity_selection::entity_selection(std::vector<c_api::entity_descriptor> &&selection)
-            : selection_(std::move(selection))
+          : selection_(std::move(selection))
         {
         }
 
@@ -20,9 +21,7 @@ namespace eld
             return selection_.data();
         }
 
-        size_t entity_selection::size() const {
-            return selection_.size();
-        }
+        size_t entity_selection::size() const { return selection_.size(); }
 
         relational_table relational_table::instance_ = {};
         relational_table &relational_table::instance() { return relational_table::instance_; }
@@ -105,6 +104,8 @@ namespace eld
             return found->second;
         }
 
+        void relational_table::release() { relational_table::instance_ = {}; }
+
         selections selections::instance_{};
 
         selections &selections::instance() { return selections::instance_; }
@@ -128,6 +129,8 @@ namespace eld
             pool_.free(selection.handle);
             selection = {};
         }
+
+        void selections::release() { selections::instance_ = {}; }
 
     }   // namespace c_core
 
