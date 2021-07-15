@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplecs/c_core/relational.hpp"
+#include "simplecs/c_api/relational.hpp"
 
 #include <cassert>
 #include <iterator>

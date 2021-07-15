@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplecs/c_core_api.hpp"
+#include "simplecs/c_api/c_core.hpp"
 #include "simplecs/config.hpp"
 
 #include "simplecs/generic/selector.h"
@@ -107,5 +107,5 @@ namespace eld::c_core
 }   // namespace eld::c_core
 
 #ifdef SIMPLECS_HEADER_ONLY
-#    include "simplecs/c_core/src/relational.ipp"
+#    include "simplecs/c_api/src/relational.ipp"
 #endif

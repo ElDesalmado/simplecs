@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplecs/c_core/storage.hpp"
+#include "simplecs/c_api/storage.hpp"
 
 #include <algorithm>
 #include <cassert>

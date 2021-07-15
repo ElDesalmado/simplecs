@@ -237,6 +237,6 @@ namespace eld::c_api
 }   // namespace eld::c_api
 
 #ifdef SIMPLECS_HEADER_ONLY
-#    include "simplecs/c_core/src/storage.ipp"
-#    include "simplecs/c_core/src/relational.ipp"
+#    include "simplecs/c_api/src/storage.ipp"
+#    include "simplecs/c_api/src/relational.ipp"
 #endif

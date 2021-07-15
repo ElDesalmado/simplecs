@@ -9,5 +9,5 @@
 #endif
 
 #include "simplecs/src/c_registry.ipp"
-#include "simplecs/c_core/src/relational.ipp"
-#include "simplecs/c_core/src/storage.ipp"
+#include "simplecs/c_api/src/relational.ipp"
+#include "simplecs/c_api/src/storage.ipp"
