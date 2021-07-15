@@ -1,13 +1,15 @@
 ﻿#pragma once
 
-#include "simplecs/c_api/c_core.hpp"
+#include "simplecs/c_api/entity_storage.hpp"
 
 namespace eld
 {
+    namespace c_core
+    {
+    }
 
     namespace c_api
     {
-
         void allocate_entities(entity_descriptor *&/*array*/,
                                size_t /*length*/,
                                entity_allocation_error *&/*results*/)
@@ -21,8 +23,5 @@ namespace eld
         {
             // TODO: implement
         }
-
-
-    }   // namespace c_api
-
-}   // namespace eld
+    }
+}
