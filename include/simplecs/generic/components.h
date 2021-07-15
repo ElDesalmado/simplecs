@@ -28,7 +28,7 @@ namespace eld
         template<typename ComponentDescriptorT, typename ImplT>
         constexpr ComponentDescriptorT component_descriptor(const ImplT &impl)
         {
-            return impl.component_descriptor();
+            return impl.component_descriptor_type();
         }
 
     }   // namespace custom
@@ -42,12 +42,12 @@ namespace eld
             using implementation_type = ImplT;
             using traits = TraitsT;
 
-            using component_descriptor = typename traits::component_descriptor;
+            using component_descriptor_type = typename traits::component_descriptor_type;
 
             /**
              * Typename of contained data.
              */
-            using type = typename component_descriptor::type;
+            using type = typename component_descriptor_type::type;
 
             template<
                 bool DefaultConstructible = std::is_default_constructible_v<implementation_type>,
@@ -63,9 +63,9 @@ namespace eld
             {
             }
 
-            constexpr component_descriptor descriptor() const
+            constexpr component_descriptor_type descriptor() const
             {
-                return custom::component_descriptor<component_descriptor>(impl_);
+                return custom::component_descriptor<component_descriptor_type>(impl_);
             }
 
         private:
