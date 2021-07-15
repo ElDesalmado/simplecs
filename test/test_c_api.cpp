@@ -1,5 +1,5 @@
 ﻿
-#include "simplecs/c_core_api.hpp"
+#include "simplecs/c_api/c_core.hpp"
 
 #include <gtest/gtest.h>
 
@@ -79,7 +79,7 @@ TEST(c_api_registry, selec_entities)
     EXPECT_EQ(entitySelection.length, 2);
 
     free_entity_selection(entitySelection);
-    EXPECT_EQ(entitySelection.handle, invalid_id);
+    EXPECT_EQ(entitySelection.handle, -1);
     EXPECT_EQ(entitySelection.array, nullptr);
     EXPECT_EQ(entitySelection.length, 0);
 
