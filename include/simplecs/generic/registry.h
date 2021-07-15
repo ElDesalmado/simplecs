@@ -7,6 +7,7 @@
 
 // TODO: specification
 
+// TODO: add component construction with tuple of forwarded arguments
 /**
  * C++ generic API class for registry.
  * Functions:
@@ -29,8 +30,29 @@ namespace eld
     {
     };
 
+    template<typename ComponentT, typename... ArgsT>
+    struct component_args
+    {
+        std::tuple<ArgsT &&...> forwardedArgs;
+    };
+
+    template<typename ComponentT, typename... ArgsT>
+    component_args<ComponentT, ArgsT...> forward_construct(ArgsT &&...args)
+    {
+        return { std::forward_as_tuple(args...) };
+    }
+
     namespace custom
     {
+        template <typename ComponentArgPackT>
+        struct arg_pack_component_type;
+
+        template <typename ComponentT, typename ... ArgsT>
+        struct arg_pack_component_type<component_args<ComponentT, ArgsT...>>
+        {
+            using type = ComponentT;
+        };
+
         /**
          * Customization point for entity creation.
          * @tparam ImplT

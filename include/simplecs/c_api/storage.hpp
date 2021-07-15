@@ -21,17 +21,17 @@ namespace eld::c_core
         component_storage(component_id id, const c_api::storage_params &params);
 
         c_api::allocate_component_error allocate(const c_api::entity_descriptor &entity,
-                                                 c_api::component_pointer *&pointer);
+                                                 c_api::component_pointer &pointer);
         c_api::deallocate_component_error deallocate(const c_api::entity_descriptor &entity,
-                                                     c_api::component_pointer *&pointer);
+                                                     c_api::component_pointer &pointer);
 
         c_api::allocate_component_error construct(const c_api::entity_descriptor &entity,
-                                                  c_api::component_pointer *&pointer,
+                                                  c_api::component_pointer &pointer,
                                                   const c_api::tuple *args,
                                                   size_t argsSizeBytes);
 
         c_api::get_component_error get_component(const c_api::entity_descriptor &entity,
-                                                 c_api::component_pointer *&pointer);
+                                                 c_api::component_pointer &pointer);
 
         ~component_storage();
 

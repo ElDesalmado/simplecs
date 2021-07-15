@@ -65,23 +65,23 @@ namespace eld
 
         c_api::allocate_component_error component_storage::allocate(
             const c_api::entity_descriptor &entity,
-            c_api::component_pointer *&pointer)
+            c_api::component_pointer &pointer)
         {
             auto optionalFound = find_component(entity);
             if (!optionalFound)
                 return c_api::allocate_component_error::already_exists;
 
             void *pAllocatedMemory = operator new(componentSize_);
-            pointer->pObject = pAllocatedMemory;
-            pointer->componentSize = componentSize_;
-            pointer->componentDescriptor.id = componentId_;
+            pointer.pObject = pAllocatedMemory;
+            pointer.componentSize = componentSize_;
+            pointer.componentDescriptor.id = componentId_;
 
             return c_api::allocate_component_error::success;
         }
 
         c_api::deallocate_component_error component_storage::deallocate(
             const c_api::entity_descriptor &entity,
-            c_api::component_pointer *&pointer)
+            c_api::component_pointer &pointer)
         {
             auto optionalFound = find_component(entity);
             if (!optionalFound)
@@ -89,13 +89,13 @@ namespace eld
 
             in_place_destroy(*optionalFound);
             component_storage::free(*optionalFound);
-            *pointer = {};
+            pointer = {};
             return c_api::deallocate_component_error::success;
         }
 
         c_api::allocate_component_error component_storage::construct(
             const c_api::entity_descriptor &entity,
-            c_api::component_pointer *&pointer,
+            c_api::component_pointer &pointer,
             const c_api::tuple *args,
             size_t argsSizeBytes)
         {
@@ -106,7 +106,7 @@ namespace eld
             if ((bool)res)
                 return res;
 
-            pInPlaceConstructor_(pointer->pObject, componentSize_, args, argsSizeBytes);
+            pInPlaceConstructor_(pointer.pObject, componentSize_, args, argsSizeBytes);
             return c_api::allocate_component_error::success;
         }
 
@@ -122,15 +122,15 @@ namespace eld
 
         c_api::get_component_error component_storage::get_component(
             const c_api::entity_descriptor &entity,
-            c_api::component_pointer *&pointer)
+            c_api::component_pointer &pointer)
         {
             auto optionalFound = find_component(entity);
             if (!optionalFound)
                 return c_api::get_component_error::invalid_entity;
 
-            pointer->pObject = reinterpret_cast<decltype(pointer->pObject)>(*optionalFound);
-            pointer->componentSize = componentSize_;
-            pointer->componentDescriptor.id = componentId_;
+            pointer.pObject = reinterpret_cast<decltype(pointer.pObject)>(*optionalFound);
+            pointer.componentSize = componentSize_;
+            pointer.componentDescriptor.id = componentId_;
 
             return c_api::get_component_error::success;
         }
@@ -224,7 +224,7 @@ namespace eld
 
         allocate_component_error allocate_component(const entity_descriptor &entity,
                                                     const component_descriptor &componentDescriptor,
-                                                    component_pointer *&pointer)
+                                                    component_pointer &pointer)
         {
             auto optionalStorage = c_core::storages::instance().get_storage(componentDescriptor);
             if (!optionalStorage)
@@ -233,25 +233,25 @@ namespace eld
             return optionalStorage->get().allocate(entity, pointer);
         }
 
-        allocate_component_error construct_component(
-            const entity_descriptor &entity,
-            const component_descriptor &componentDescriptor,
-            component_pointer *&pointer,
-            const tuple *args,
-            size_t argsSizeBytes)
-        {
-            auto optionalStorage = c_core::storages::instance().get_storage(componentDescriptor);
-            if (!optionalStorage)
-                return allocate_component_error::invalid_component_descriptor;
-
-            return optionalStorage->get().construct(entity, pointer, args, argsSizeBytes);
-        }
+//        allocate_component_error construct_component(
+//            const entity_descriptor &entity,
+//            const component_descriptor &componentDescriptor,
+//            component_pointer *&pointer,
+//            const tuple *args,
+//            size_t argsSizeBytes)
+//        {
+//            auto optionalStorage = c_core::storages::instance().get_storage(componentDescriptor);
+//            if (!optionalStorage)
+//                return allocate_component_error::invalid_component_descriptor;
+//
+//            return optionalStorage->get().construct(entity, pointer, args, argsSizeBytes);
+//        }
 
         deallocate_component_error deallocate_component(const entity_descriptor &entity,
-                                                        component_pointer *&pointer)
+                                                        component_pointer &pointer)
         {
             auto optionalStorage =
-                c_core::storages::instance().get_storage(pointer->componentDescriptor);
+                c_core::storages::instance().get_storage(pointer.componentDescriptor);
             if (!optionalStorage)
                 return deallocate_component_error::invalid_component_descriptor;
 
@@ -260,7 +260,7 @@ namespace eld
 
         get_component_error get_component(const entity_descriptor &entity,
                                           const component_descriptor &componentDescriptor,
-                                          component_pointer *&pointer)
+                                          component_pointer &pointer)
         {
             auto optionalStorage = c_core::storages::instance().get_storage(componentDescriptor);
             if (!optionalStorage)

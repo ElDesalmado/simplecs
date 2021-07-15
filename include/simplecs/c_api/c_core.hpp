@@ -187,25 +187,27 @@ namespace eld::c_api
         SIMPLECS_DECL release_component_storage_error
             release_component_storage(component_storage_descriptor &storageDescriptor);
 
+        // TODO: clarify. Can a component exist without an entity?
         SIMPLECS_DECL allocate_component_error
             allocate_component(const entity_descriptor &entity,
                                const component_descriptor &componentDescriptor,
-                               component_pointer *&pointer);
+                               component_pointer &pointer);
 
-        SIMPLECS_DECL allocate_component_error
-            construct_component(const entity_descriptor &entity,
-                                const component_descriptor &component,
-                                component_pointer *&pointer,
-                                const tuple *args,
-                                size_t argsSizeBytes);
+        // TODO: clarify this function. Remove?
+//        SIMPLECS_DECL allocate_component_error
+//            construct_component(const entity_descriptor &entity,
+//                                const component_descriptor &component,
+//                                component_pointer *&pointer,
+//                                const tuple *args,
+//                                size_t argsSizeBytes);
 
         SIMPLECS_DECL deallocate_component_error
-            deallocate_component(const entity_descriptor &entity, component_pointer *&pointer);
+            deallocate_component(const entity_descriptor &entity, component_pointer &pointer);
 
         SIMPLECS_DECL get_component_error
             get_component(const entity_descriptor &entity,
                           const component_descriptor &componentDescriptor,
-                          component_pointer *&pointer);
+                          component_pointer &pointer);
 
         SIMPLECS_DECL void release_context();
     }
