@@ -22,6 +22,11 @@
 
 namespace eld
 {
+    template<typename...>
+    struct type_list
+    {
+    };
+
     namespace custom
     {
         /**
@@ -68,6 +73,17 @@ namespace eld
             return impl.emplace_components(std::forward<ComponentsT>(components)...);
         }
 
+        template<typename SelectionType,
+                 typename ImplT,
+                 typename EntityDescriptorT,
+                 typename... ComponentsT>
+        SelectionType select_entities(ImplT &impl,
+                                      const EntityDescriptorT &entityDescriptor,
+                                      type_list<ComponentsT...> including)
+        {
+            return impl.select_entities(entityDescriptor, including);
+        }
+
     }   // namespace custom
 
     namespace generic
@@ -87,6 +103,10 @@ namespace eld
 
             using entity_type = typename traits::entity_type;
             using entity_descriptor = typename entity_type::descriptor;
+
+            template<typename... ComponentsT>
+            using selection_type =
+                typename implementation_type::template selection_type<ComponentsT...>;
 
             template<
                 bool DefaultConstructible = std::is_default_constructible_v<implementation_type>,
@@ -147,6 +167,21 @@ namespace eld
                 return custom::emplace_components<entity_type>(
                     impl_,
                     std::forward<ComponentsT>(components)...);
+            }
+
+            /**
+             * Get selection for entities that has components of given types
+             * @tparam ComponentsT Components to include on search.
+             * @param entityDescriptor
+             * @return
+             */
+            template<typename... ComponentsT>
+            selection_type<ComponentsT...> select(const entity_descriptor &entityDescriptor)
+            {
+                return custom::select_entities<selection_type<ComponentsT...>>(
+                    impl_,
+                    entityDescriptor,
+                    type_list<ComponentsT...>());
             }
 
         private:
