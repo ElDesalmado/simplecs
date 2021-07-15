@@ -17,23 +17,15 @@ namespace eld
 {
     namespace impl
     {
-        struct component_traits_c
-        {
-            using component_descriptor_type = c_api::component_descriptor;
-        };
 
         template<typename ClassType>
         class component_c
         {
         public:
-            using component_descriptor_type = component_traits_c::component_descriptor_type;
+            using component_descriptor_type = c_api::component_descriptor;
             using type = ClassType;
 
-            SIMPLECS_DECL static component_descriptor_type component_descriptor()
-            {
-                static c_context context{};
-                return context.descriptor();
-            }
+            SIMPLECS_DECL static component_descriptor_type component_descriptor();
 
         private:
             class c_context

@@ -5,6 +5,14 @@
 namespace eld::impl
 {
     template<typename ClassType>
+    typename component_c<ClassType>::component_descriptor_type
+        component_c<ClassType>::component_descriptor()
+    {
+        static c_context context{};
+        return context.descriptor().componentDescriptor;
+    }
+
+    template<typename ClassType>
     component_c<ClassType>::c_context::c_context()
     {
         // TODO: errors, params

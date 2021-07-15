@@ -22,7 +22,7 @@ add_library(eld::simplecs ALIAS simplecs)
 
 add_library(simplecs_shared SHARED shared_lib.cpp)
 target_link_libraries(simplecs_shared PUBLIC simplecs)
-target_compile_definitions(simplecs_shared PUBLIC SIMPLESC_SHARED)
+target_compile_definitions(simplecs_shared PUBLIC SIMPLECS_SHARED)
 add_library(eld::simplecs_shared ALIAS simplecs_shared)
 
 # workaround for MinGW
