@@ -26,8 +26,8 @@ namespace eld::c_api
     struct entity_selection
     {
         size_t handle = -1;
-        const entity_descriptor *array;
-        size_t length;
+        const entity_descriptor *array = nullptr;
+        size_t length = 0;
     };
 
     enum class reg_error : uint8_t
@@ -51,23 +51,23 @@ namespace eld::c_api
 
     struct component_storage_descriptor
     {
-        component_descriptor componentDescriptor;
-        size_t componentSize;
+        component_descriptor componentDescriptor{};
+        size_t componentSize{};
     };
 
     struct tuple;
 
     struct storage_params
     {
-        size_t componentSize;
+        size_t componentSize{};
         void (*pInPlaceConstruct)(void *pAllocatedMemory,
                                   size_t allocatedSize,
                                   const tuple *args,
-                                  size_t argsSizeBytes);
+                                  size_t argsSizeBytes){};
 
-        void (*pInPlaceDestroy)(void *pObject, size_t objectSize);
-        void *pConstructorCallable;
-        void *pDestructorCallable;
+        void (*pInPlaceDestroy)(void *pObject, size_t objectSize){};
+        void *pConstructorCallable{};
+        void *pDestructorCallable{};
     };
 
     struct component_pointer

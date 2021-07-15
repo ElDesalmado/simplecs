@@ -16,14 +16,14 @@ namespace eld::impl
     component_c<ClassType>::c_context::c_context()
     {
         // TODO: errors, params
-        auto error =
+        [[maybe_unused]] auto error =
             c_api::init_component_storage(descriptor_, c_api::storage_params{ sizeof(type) });
     }
 
     template<typename ClassType>
     component_c<ClassType>::c_context::~c_context()
     {
-        auto error = c_api::release_component_storage(descriptor_);
+        [[maybe_unused]] auto error = c_api::release_component_storage(descriptor_);
     }
 
     template<typename ClassType>
