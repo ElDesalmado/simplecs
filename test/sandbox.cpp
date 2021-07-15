@@ -1,6 +1,5 @@
 ﻿
-#include "simplecs/c_core_api.hpp"
-#include "simplecs/registry.h"
+#include "simplecs/c_api/c_core.hpp"
 
 #include <cstdint>
 
@@ -31,9 +30,5 @@ int main()
     {
         using traits [[maybe_unused]] = ::traits;
     };
-
-    eld::generic::registry<dummy_impl> dummyRegistry{};
-    dummyRegistry.destroy(dummyRegistry.create());
-
 
 }

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplecs/c_core/storage.hpp"
+#include "simplecs/c_api/storage.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -171,16 +171,6 @@ namespace eld
             return found->second;
         }
 
-        size_t storages::next_available_id()
-        {
-            if (freedInstances_.empty())
-                return instances_++;
-
-            const auto id = freedInstances_.top();
-            freedInstances_.pop();
-            return id;
-        }
-
         c_api::allocation_component_storage_error storages::init_storage(
             c_api::component_storage_descriptor &outputDescriptor,
             const c_api::storage_params &inputParams)
@@ -188,7 +178,7 @@ namespace eld
             if (!inputParams.componentSize)
                 return c_api::allocation_component_storage_error::invalid_component_size;
 
-            const auto id = next_available_id();
+            const auto id = idPool_.next_available();
             [[maybe_unused]] auto res =
                 map_.emplace(std::make_pair(id, component_storage(id, inputParams)));
             assert(res.second && "Filed to emplace new component storage!");
@@ -208,6 +198,9 @@ namespace eld
                 return c_api::release_component_storage_error::invalid_component_descriptor;
 
             map_.erase(found);
+            idPool_.free(storageDescriptor.componentDescriptor.id);
+            storageDescriptor = {};
+
             return c_api::release_component_storage_error::success;
         }
     }   // namespace c_core

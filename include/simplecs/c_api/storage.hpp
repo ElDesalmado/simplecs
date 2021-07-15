@@ -1,12 +1,13 @@
 ﻿#pragma once
 
-#include "simplecs/c_core_api.hpp"
+#include "simplecs/c_api/c_core.hpp"
 #include "simplecs/config.hpp"
+
+#include "simplecs/impl/id_pool.h"
 
 #include <functional>
 #include <limits>
 #include <optional>
-#include <stack>
 #include <tuple>
 #include <vector>
 
@@ -80,19 +81,18 @@ namespace eld::c_core
             c_api::component_storage_descriptor &storageDescriptor);
 
     private:
-        size_t next_available_id();
+        using storage_id = size_t;
 
     private:
         static storages instance_;
 
         // TODO: use descriptor ?
         std::unordered_map<size_t, component_storage> map_;
-        size_t instances_;
-        std::stack<size_t> freedInstances_;
+        eld::detail::id_pool<storage_id> idPool_;
     };
 
 }   // namespace eld::c_core
 
 #ifdef SIMPLECS_HEADER_ONLY
-#    include "simplecs/c_core/src/storage.ipp"
+#    include "simplecs/c_api/src/storage.ipp"
 #endif
