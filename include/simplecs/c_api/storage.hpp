@@ -58,7 +58,7 @@ namespace eld::c_core
 
             while (num--)
             {
-                const auto handle = handlePool_.next_available();
+                const handle_type handle{handlePool_.next_available()};
                 assert(map_.find(handle) == map_.cend() && "Handle already registered!");
 
                 const auto allocated = component_storage_impl::allocate(typeDescriptor_.typeSize);
@@ -125,12 +125,19 @@ namespace eld::c_core
         {
             return static_cast<c_api::object *>(operator new(componentSize));
         }
+
         static std::function<void(c_api::object *pObject)> make_destructor(
             void (*pFunction)(c_api::callable *, c_api::object *),
             c_api::callable *pCallable)
         {
-            assert(pFunction && "Function is nullptr!");
-            return [=](c_api::object *pObject) { pFunction(pCallable, pObject); };
+            if (!pFunction)
+                return [](c_api::object *pObject) { operator delete(pObject); };
+
+            return [=](c_api::object *pObject)
+            {
+                pFunction(pCallable, pObject);
+                operator delete(pObject);
+            };
         }
 
         void deallocate(c_api::object *pObject)
@@ -142,7 +149,7 @@ namespace eld::c_core
     private:
         c_api::type_descriptor typeDescriptor_;
         std::unordered_map<handle_type, c_api::object *> map_;
-        eld::detail::id_pool<handle_type> handlePool_;
+        eld::detail::id_pool<decltype(std::declval<handle_type>().h)> handlePool_;
         std::function<void(c_api::object *pObject)> deallocate_;
     };
 

@@ -11,6 +11,11 @@ target_link_libraries(test.registry simplecs GTest::gtest)
 add_test(NAME test.registry
         COMMAND test.registry)
 
+add_executable(test.c_api_component_storage test_c_api_component_storage.cpp)
+target_link_libraries(test.c_api_component_storage eld::simplecs_shared GTest::gtest)
+add_test(NAME test.c_api_component_storage
+        COMMAND test.c_api_component_storage)
+
 add_executable(test.c_api test_c_api.cpp)
 target_link_libraries(test.c_api eld::simplecs_shared GTest::gtest)
 add_test(NAME test.c_api

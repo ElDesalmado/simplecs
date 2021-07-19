@@ -101,9 +101,8 @@ namespace eld
                 return allocate_component_error::invalid_component_descriptor;
 
             c_core::c_component_storage &storage = *optionalStorage;
-            auto emplaced = storage.emplace(1)[0];
 
-            pointer = emplaced;
+            pointer = storage.emplace(1)[0];
             return allocate_component_error::success;
         }
 

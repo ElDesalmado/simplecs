@@ -232,13 +232,15 @@ namespace eld::c_api
                                                size_t length,
                                                entity_allocation_error *&results);
 
+
         /**
-         * Initialize a storage for a component. Assigns new id for the component.
-         * @param outputDescriptor Component storage descriptor for .
-         * @param inputParams
+         * Initialize new component storage.
+         * @param storageParams
+         * @param outputDescriptor
+         * @return
          */
         SIMPLECS_DECL allocation_component_storage_error
-            init_component_storage(const storage_params &inputParams,
+            init_component_storage(const storage_params &storageParams,
                                    type_descriptor &outputDescriptor,
                                    const policy *);
 

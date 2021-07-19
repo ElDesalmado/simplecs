@@ -46,7 +46,7 @@ namespace eld::detail
         }
 
     private:
-        id_type instances_;
+        id_type instances_{};
         std::stack<id_type> freed_;
     };
 }   // namespace eld::detail
