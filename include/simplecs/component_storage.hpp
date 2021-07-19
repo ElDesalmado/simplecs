@@ -84,7 +84,7 @@ namespace simplecs::eld
                 throw std::invalid_argument(
                     "eld::component_storage::get_component: invalid component descriptor");
 
-            return pointer;
+            return component_reference_type(pointer);
         }
 
         const component_reference_type get_component(const handle_type &componentHandle) const
@@ -98,14 +98,14 @@ namespace simplecs::eld
                 throw std::invalid_argument(
                     "eld::component_storage::get_component: invalid component descriptor");
 
-            return pointer;
+            return component_reference_type(pointer);
         }
 
     private:
         static SIMPLECS_DECL simplecs::c_api::type_descriptor get_type_descriptor();
 
         template<typename... ArgsT, size_t... I>
-        static component_reference<component_type> allocate_component(std::tuple<ArgsT &&...> args,
+        static component_reference_type allocate_component(std::tuple<ArgsT &&...> args,
                                                                       std::index_sequence<I...>)
         {
             c_api::component_pointer componentPointer{};
@@ -117,7 +117,7 @@ namespace simplecs::eld
             new (componentPointer.pObject)
                 component_type(std::forward<ArgsT>(std::get<I>(args))...);
 
-            return componentPointer;
+            return component_reference_type(componentPointer);
         }
 
     private:

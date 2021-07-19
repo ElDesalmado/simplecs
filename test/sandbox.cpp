@@ -1,34 +1,34 @@
 ﻿
 #include "simplecs/c_api/c_core.hpp"
+#include "simplecs/registry.hpp"
 
-#include <cstdint>
+#include <iostream>
 
-struct traits
-{
-    using entity_type = size_t;
-};
-
-class dummy_impl
+class Constructible
 {
 public:
-    using traits = ::traits;
-
-    constexpr traits::entity_type create_entity()
+    Constructible(int c, double d)
+        : c(c),
+        d(d)
     {
-        return 4;
+        std::cout << this->c << " " << this->d << std::endl;
     }
 
-    void destroy_entity(const traits::entity_type&)
+    ~Constructible()
     {
-
+        std::cout << this->c << " " << this->d << std::endl;
     }
+private:
+    int c;
+    double d;
 };
 
 int main()
 {
-    struct with_traits
-    {
-        using traits [[maybe_unused]] = ::traits;
-    };
+    auto storage = simplecs::eld::get_component_storage<Constructible>();
+    auto vecEmplaced = storage.emplace(std::forward_as_tuple(4, 8.15));
 
+    (void)vecEmplaced.size();
+
+    return 0;
 }
