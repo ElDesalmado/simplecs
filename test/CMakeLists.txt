@@ -29,3 +29,8 @@ endif()
 
 
 message(STATUS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+add_executable(test.id_pool test_id_pool.cpp)
+target_link_libraries(test.id_pool simplecs GTest::gtest)
+add_test(NAME test.id_pool
+        COMMAND test.id_pool)
