@@ -1,10 +1,12 @@
 ﻿#pragma once
 
 #include <cstddef>
+#include <utility>
 
 namespace eld::c_api
 {
     struct object;
+    struct callable;
 
     /**
      * Typesafe handle
@@ -115,4 +117,21 @@ namespace eld::c_api
         return !(lhs < rhs) && !(rhs < lhs);
     }
 
+}
+
+namespace eld
+{
+    /**
+     * Make wrapped stateless destructor for \tp T
+     * @tparam T
+     * @return
+     */
+    template <typename T>
+    constexpr auto make_destructor()
+    {
+        return [](c_api::callable *, c_api::object *pObject)
+        {
+            static_cast<T*>(static_cast<void*>(pObject))->~T();
+        };
+    }
 }

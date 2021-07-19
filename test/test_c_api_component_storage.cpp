@@ -31,24 +31,10 @@ TEST(c_api_component_storage, deallocation_test_explicit)
 {
     using namespace eld;
 
-    struct Destructor
-    {
-        static void destroy(Destructor *destructor, TestDestructor *pObject)
-        {
-            EXPECT_TRUE(destructor);
-            ASSERT_TRUE(pObject);
-
-            pObject->~TestDestructor();
-        }
-    };
-
-    Destructor destructor;
-
     const auto storageParams =
         c_api::storage_params{ sizeof(TestDestructor),
-                               reinterpret_cast<void (*)(c_api::callable *, c_api::object *)>(
-                                   (void *)&Destructor::destroy),
-                               reinterpret_cast<c_api::callable *>(&destructor) };
+                               eld::make_destructor<TestDestructor>(),
+                               nullptr };
 
     c_api::type_descriptor newTypeDescriptor{};
 
