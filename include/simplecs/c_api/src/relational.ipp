@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "simplecs/c_api/relational.hpp"
+#include "simplecs/generic/relational_table.h"
+#include "simplecs/impl/relational_table.h"
 
 #include <cassert>
 #include <iterator>
