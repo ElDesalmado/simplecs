@@ -50,7 +50,11 @@ namespace eld
                     componentStorages_.erase(typeDescriptor);
                 }
 
-                void clear() { componentStorages_.clear(); }
+                void clear()
+                {
+                    idPool_ = {};
+                    componentStorages_.clear();
+                }
 
                 std::optional<std::reference_wrapper<c_component_storage>> get(
                     const c_api::type_descriptor &descriptor)

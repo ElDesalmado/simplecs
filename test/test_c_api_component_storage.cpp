@@ -64,6 +64,43 @@ TEST(c_api_component_storage, deallocation_test_explicit)
     ASSERT_EQ(n, 42);
 }
 
+/**
+ * Implicitly deallocate created component by releasing c_api context
+ */
+TEST(c_api_component_storage, deallocation_test_implicit)
+{
+    using namespace eld;
+
+    const auto storageParams =
+        c_api::storage_params{ sizeof(TestDestructor),
+                               eld::make_destructor<TestDestructor>(),
+                               nullptr };
+
+    c_api::type_descriptor newTypeDescriptor{};
+
+    {
+        auto error = c_api::init_component_storage(storageParams, newTypeDescriptor, nullptr);
+        ASSERT_FALSE(bool(error));
+    }
+
+    c_api::component_pointer pointer{};
+
+    {
+        auto error = c_api::allocate_component(newTypeDescriptor, pointer);
+        ASSERT_FALSE(bool(error));
+        EXPECT_EQ(pointer.componentDescriptor.typeDescriptor, newTypeDescriptor);
+        EXPECT_EQ(pointer.componentDescriptor.handle, c_api::handle{ 0 });
+        ASSERT_TRUE(pointer.pObject);
+    }
+
+    int n = 0;
+    new (pointer.pObject) TestDestructor([&n]() { n = 42; });
+
+    c_api::release_context();
+
+    ASSERT_EQ(n, 42);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

@@ -58,7 +58,7 @@ namespace eld::c_core
 
             while (num--)
             {
-                const handle_type handle{handlePool_.next_available()};
+                const handle_type handle{ handlePool_.next_available() };
                 assert(map_.find(handle) == map_.cend() && "Handle already registered!");
 
                 const auto allocated = component_storage_impl::allocate(typeDescriptor_.typeSize);
@@ -118,6 +118,13 @@ namespace eld::c_core
 
             return { found->second,   //
                      c_api::component_descriptor{ found->first, typeDescriptor_ } };
+        }
+
+        ~component_storage_impl()
+        {
+            std::for_each(map_.begin(),
+                          map_.end(),
+                          [this](const auto &pair) { this->deallocate(pair.second); });
         }
 
     private:
