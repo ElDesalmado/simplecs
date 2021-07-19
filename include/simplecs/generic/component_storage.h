@@ -59,6 +59,17 @@ namespace eld
             using component_type = typename component_traits::component_type;
             using component_reference_type = typename component_traits::component_reference_type;
 
+            template <bool DefaultConstructible = std::is_default_constructible_v<implementation_type>,
+                std::enable_if_t<DefaultConstructible, int>* = nullptr>
+            component_storage()
+                : impl_()
+            {}
+
+            template <typename ... ArgsT>
+            explicit component_storage(ArgsT &&... args)
+                : impl_(std::forward<ArgsT>(args)...)
+            {}
+
             /**
              * Emplace several components.
              * @tparam TupleArgsT
@@ -86,13 +97,13 @@ namespace eld
             // TODO: get reference
             component_reference_type get(const handle_type &componentHandle)
             {
-                return custom::get_component<component_reference_type>(impl_, componentHandle);
+                return custom::get_component(impl_, componentHandle);
             }
 
             // TODO: const reference?
             const component_reference_type get(const handle_type &componentHandle) const
             {
-                return custom::get_component<component_reference_type>(impl_, componentHandle);
+                return custom::get_component(impl_, componentHandle);
             }
 
         private:

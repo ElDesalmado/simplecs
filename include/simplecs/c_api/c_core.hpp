@@ -40,14 +40,8 @@ namespace eld::c_api
     struct storage_params
     {
         size_t componentSize{};
-        void (*pInPlaceConstruct)(void *pAllocatedMemory,
-                                  size_t allocatedSize,
-                                  const tuple *args,
-                                  size_t argsSizeBytes){};
-
-        void (*pInPlaceDestroy)(void *pObject, size_t objectSize){};
-        void *pConstructorCallable{};
-        void *pDestructorCallable{};
+        void (*pDestroy)(c_api::callable *, c_api::object *){};
+        c_api::callable *pCallable{};
     };
 
     enum error_result
@@ -113,7 +107,7 @@ namespace eld::c_api
     {
         success = 0,
         invalid_entity,
-        invalid_component_id,
+        invalid_component_descriptor,
     };
 
     enum class selection_error : uint8_t
@@ -244,24 +238,23 @@ namespace eld::c_api
          * @param inputParams
          */
         SIMPLECS_DECL allocation_component_storage_error
-            init_component_storage(component_storage_descriptor &outputDescriptor,
-                                   const storage_params &inputParams);
+            init_component_storage(const storage_params &inputParams,
+                                   type_descriptor &outputDescriptor,
+                                   const policy *);
 
         SIMPLECS_DECL release_component_storage_error
-            release_component_storage(component_storage_descriptor &storageDescriptor);
+            release_component_storage(type_descriptor &storageDescriptor);
 
         // TODO: clarify. Can a component exist without an entity?
         SIMPLECS_DECL allocate_component_error
-            allocate_component(const entity_descriptor &entity,
-                               const component_descriptor &componentDescriptor,
+            allocate_component(const type_descriptor &typeDescriptor,
                                component_pointer &pointer);
 
         SIMPLECS_DECL deallocate_component_error
-            deallocate_component(const entity_descriptor &entity, component_pointer &pointer);
+            deallocate_component(const component_descriptor &componentDescriptor);
 
         SIMPLECS_DECL get_component_error
-            get_component(const entity_descriptor &entity,
-                          const component_descriptor &componentDescriptor,
+            get_component(const component_descriptor & componentDescriptor,
                           component_pointer &pointer);
 
         SIMPLECS_DECL void release_context();

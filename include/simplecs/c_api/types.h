@@ -88,12 +88,17 @@ namespace eld::c_api
         return lhs.handle < rhs.handle;
     }
 
+    constexpr inline bool operator==(const entity_descriptor &lhs, const entity_descriptor &rhs)
+    {
+        return !(lhs < rhs) && !(rhs < lhs);
+    }
+
     constexpr inline bool operator<(const type_descriptor &lhs, const type_descriptor &rhs)
     {
         return lhs.typeId < rhs.typeId;
     }
 
-    constexpr inline bool operator==(const entity_descriptor &lhs, const entity_descriptor &rhs)
+    constexpr inline bool operator==(const type_descriptor &lhs, const type_descriptor &rhs)
     {
         return !(lhs < rhs) && !(rhs < lhs);
     }

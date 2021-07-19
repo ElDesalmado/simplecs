@@ -39,12 +39,15 @@ namespace eld::c_core
         using handle_type = typename component_traits::handle_type;
         using component_reference_type = typename component_traits::component_reference_type;
 
-        component_storage_impl(const c_api::type_descriptor &typeDescriptor,
-                               void (*pDestroy)(c_api::callable *, c_api::object *),
-                               c_api::callable *pCallable)
+        using component_size = decltype(std::declval<c_api::type_descriptor>().typeSize);
+
+        component_storage_impl(c_api::storage_params storageParams,
+                               c_api::type_descriptor typeDescriptor)
           : typeDescriptor_(typeDescriptor),
-            deallocate_(component_storage_impl::make_destructor(pDestroy, pCallable))
+            deallocate_(component_storage_impl::make_destructor(storageParams.pDestroy,
+                                                                storageParams.pCallable))
         {
+            // TODO: checks
         }
 
         std::vector<component_reference_type> emplace_components(int num)
@@ -57,19 +60,21 @@ namespace eld::c_core
             {
                 const auto handle = handlePool_.next_available();
                 assert(map_.find(handle) == map_.cend() && "Handle already registered!");
-                c_api::component_pointer allocated{
-                    component_storage_impl::allocate(typeDescriptor_.typeSize),
-                    c_api::component_descriptor{ handle, typeDescriptor_ }
-                };
-                map_.emplace(std::make_pair(handle, allocated));
-                out.push_back(allocated);
+
+                const auto allocated = component_storage_impl::allocate(typeDescriptor_.typeSize);
+                auto emplaced = map_.emplace(std::make_pair(handle, allocated));
+                assert(emplaced.second && "Failed to emplace new component!");
+
+                const auto componentDescriptor =
+                    c_api::component_descriptor{ emplaced.first->first, typeDescriptor_ };
+                out.emplace_back(component_reference_type{ allocated, componentDescriptor });
             }
 
             return out;
         }
 
         template<template<typename> class Container>
-        auto remove(const Container<handle_type> &handles)
+        auto remove_components(const Container<handle_type> &handles)
         {
             using namespace c_api;
             std::vector<deallocate_component_error> errors;
@@ -86,7 +91,7 @@ namespace eld::c_core
                                       deallocate_component_error::invalid_component_descriptor);
                                   return;
                               }
-                              this->deallocate(found->second.pObject);
+                              this->deallocate(found->second);
                               map_.erase(found);
                           });
         }
@@ -99,10 +104,11 @@ namespace eld::c_core
                 throw std::invalid_argument("component_storage_impl: invalid component handle");
             }
 
-            return found->second;
+            return { found->second, c_api::component_descriptor{ found->first, typeDescriptor_ } };
         }
 
-        const component_reference_type get_component(const handle_type &componentHandle) const
+        // TODO: const reference type?
+        component_reference_type get_component(const handle_type &componentHandle) const
         {
             auto found = map_.find(componentHandle);
             if (found == map_.cend())
@@ -110,12 +116,11 @@ namespace eld::c_core
                 throw std::invalid_argument("component_storage_impl: invalid component handle");
             }
 
-            return found->second;
+            return { found->second,   //
+                     c_api::component_descriptor{ found->first, typeDescriptor_ } };
         }
 
     private:
-        using component_size = decltype(std::declval<c_api::type_descriptor>().typeSize);
-
         static c_api::object *allocate(component_size componentSize)
         {
             return static_cast<c_api::object *>(operator new(componentSize));
@@ -136,7 +141,7 @@ namespace eld::c_core
 
     private:
         c_api::type_descriptor typeDescriptor_;
-        std::unordered_map<handle_type, c_api::component_pointer> map_;
+        std::unordered_map<handle_type, c_api::object *> map_;
         eld::detail::id_pool<handle_type> handlePool_;
         std::function<void(c_api::object *pObject)> deallocate_;
     };

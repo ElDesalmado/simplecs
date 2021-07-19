@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cassert>
 #include <new>
+#include <optional>
 
 template<>
 struct std::hash<eld::c_api::type_descriptor>
@@ -29,18 +30,36 @@ namespace eld
             class ComponentStorages
             {
             public:
-                template<typename... ArgsT>
-                c_api::type_descriptor emplace(ArgsT &&...args)
+                c_api::type_descriptor emplace(const c_api::storage_params &storageParams)
                 {
                     const auto id = idPool_.next_available();
 
-                    auto res = componentStorages_.template emplace(
-                        std::make_pair(id,
-                                       eld::make_component_storage<c_core::component_storage_impl>(
-                                           std::forward<ArgsT>(args)...)));
+                    auto res = componentStorages_.template emplace(std::make_pair(
+                        c_api::type_descriptor{ id, storageParams.componentSize },
+                        eld::make_component_storage<c_core::component_storage_impl>(
+                            storageParams,
+                            c_api::type_descriptor{ id, storageParams.componentSize })));
 
                     assert(res.second && "Failed to emplace new component storage!");
                     return res.first->first;
+                }
+
+                void release(const c_api::type_descriptor &typeDescriptor)
+                {
+                    // TODO: handle errors
+                    componentStorages_.erase(typeDescriptor);
+                }
+
+                void clear() { componentStorages_.clear(); }
+
+                std::optional<std::reference_wrapper<c_component_storage>> get(
+                    const c_api::type_descriptor &descriptor)
+                {
+                    auto found = componentStorages_.find(descriptor);
+                    if (found == componentStorages_.cend())
+                        return std::nullopt;
+
+                    return found->second;
                 }
 
             private:
@@ -56,37 +75,66 @@ namespace eld
     namespace c_api
     {
         allocation_component_storage_error init_component_storage(
-            component_storage_descriptor & /*outputDescriptor*/,
-            const storage_params & /*inputParams*/)
+            const storage_params &storageParams,
+            type_descriptor &outputDescriptor,
+            const policy *)
         {
-            return {};
+            // TODO: try-catch
+            outputDescriptor = c_core::componentStorages.emplace(storageParams);
+            return allocation_component_storage_error::success;
         }
 
         release_component_storage_error release_component_storage(
-            component_storage_descriptor & /*storageDescriptor*/)
+            type_descriptor &storageDescriptor)
         {
-            return {};
+            // TODO: try-catch?
+            c_core::componentStorages.release(storageDescriptor);
+            storageDescriptor = {};
+            return release_component_storage_error::success;
         }
 
-        allocate_component_error allocate_component(
-            const entity_descriptor & /*entity*/,
-            const component_descriptor & /*componentDescriptor*/,
-            component_pointer & /*pointer*/)
+        allocate_component_error allocate_component(const type_descriptor &typeDescriptor,
+                                                    component_pointer &pointer)
         {
-            return {};
+            auto optionalStorage = c_core::componentStorages.get(typeDescriptor);
+            if (!optionalStorage)
+                return allocate_component_error::invalid_component_descriptor;
+
+            c_core::c_component_storage &storage = *optionalStorage;
+            auto emplaced = storage.emplace(1)[0];
+
+            pointer = emplaced;
+            return allocate_component_error::success;
         }
 
-        deallocate_component_error deallocate_component(const entity_descriptor & /*entity*/,
-                                                        component_pointer & /*pointer*/)
+        deallocate_component_error deallocate_component(const component_descriptor &componentDescriptor)
         {
-            return {};
+            auto optionalStorage = c_core::componentStorages.get(componentDescriptor.typeDescriptor);
+            if (!optionalStorage)
+                return deallocate_component_error::invalid_component_descriptor;
+
+            c_core::c_component_storage &storage = *optionalStorage;
+
+            // TODO: errors
+            storage.remove(std::vector{componentDescriptor.handle});
+
+            return deallocate_component_error::success;
         }
 
-        get_component_error get_component(const entity_descriptor & /*entity*/,
-                                          const component_descriptor & /*componentDescriptor*/,
-                                          component_pointer & /*pointer*/)
+        get_component_error get_component(const component_descriptor & componentDescriptor,
+                                          component_pointer &pointer)
         {
-            return {};
+            auto optionalStorage = c_core::componentStorages.get(componentDescriptor.typeDescriptor);
+            if (!optionalStorage)
+                return get_component_error::invalid_component_descriptor;
+
+            c_core::c_component_storage &storage = *optionalStorage;
+
+            // TODO: errors
+
+            pointer = storage.get(componentDescriptor.handle);
+
+            return get_component_error::success;
         }
     }   // namespace c_api
 

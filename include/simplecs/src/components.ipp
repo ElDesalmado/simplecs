@@ -40,7 +40,7 @@ namespace eld::impl
             std::terminate();
 
         reinterpret_cast<type*>(pointer.pObject)->~type();
-        c_api::deallocate_component(entity_descriptor(), pointer);
+//        c_api::deallocate_component(entity_descriptor(), pointer);
     }
 
     template<typename ClassType>
@@ -69,14 +69,14 @@ namespace eld::impl
     component_c<ClassType>::c_context::c_context()
     {
         // TODO: errors, params
-        [[maybe_unused]] auto error =
-            c_api::init_component_storage(descriptor_, c_api::storage_params{ sizeof(type) });
+//        [[maybe_unused]] auto error =
+//            c_api::init_component_storage(descriptor_, c_api::storage_params{ sizeof(type) });
     }
 
     template<typename ClassType>
     component_c<ClassType>::c_context::~c_context()
     {
-        [[maybe_unused]] auto error = c_api::release_component_storage(descriptor_);
+//        [[maybe_unused]] auto error = c_api::release_component_storage(descriptor_);
     }
 
     template<typename ClassType>
