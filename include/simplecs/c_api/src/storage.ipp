@@ -74,7 +74,7 @@ namespace eld
             void *pAllocatedMemory = operator new(componentSize_);
             pointer.pObject = pAllocatedMemory;
             pointer.componentSize = componentSize_;
-            pointer.componentDescriptor.id = componentId_;
+            pointer.componentDescriptor.typeId = componentId_;
 
             return c_api::allocate_component_error::success;
         }
@@ -130,7 +130,7 @@ namespace eld
 
             pointer.pObject = reinterpret_cast<decltype(pointer.pObject)>(*optionalFound);
             pointer.componentSize = componentSize_;
-            pointer.componentDescriptor.id = componentId_;
+            pointer.componentDescriptor.typeId = componentId_;
 
             return c_api::get_component_error::success;
         }
@@ -164,7 +164,7 @@ namespace eld
         std::optional<std::reference_wrapper<component_storage>> storages::get_storage(
             const c_api::component_descriptor &descriptor)
         {
-            auto found = map_.find(descriptor.id);
+            auto found = map_.find(descriptor.typeId);
             if (found == map_.cend())
                 return std::nullopt;
 
@@ -184,7 +184,7 @@ namespace eld
             assert(res.second && "Filed to emplace new component storage!");
 
             outputDescriptor.componentSize = inputParams.componentSize;
-            outputDescriptor.componentDescriptor.id = id;
+            outputDescriptor.componentDescriptor.typeId = id;
 
             return c_api::allocation_component_storage_error::success;
         }
@@ -193,12 +193,12 @@ namespace eld
             c_api::component_storage_descriptor &storageDescriptor)
         {
             // TODO: decrease counter or add id to stack of freed ids
-            auto found = map_.find(storageDescriptor.componentDescriptor.id);
+            auto found = map_.find(storageDescriptor.componentDescriptor.typeId);
             if (found == map_.cend())
                 return c_api::release_component_storage_error::invalid_component_descriptor;
 
             map_.erase(found);
-            idPool_.free(storageDescriptor.componentDescriptor.id);
+            idPool_.free(storageDescriptor.componentDescriptor.typeId);
             storageDescriptor = {};
 
             return c_api::release_component_storage_error::success;

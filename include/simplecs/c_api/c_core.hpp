@@ -1,33 +1,49 @@
 ﻿#pragma once
 
+#include "simplecs/c_api/types.h"
 #include "simplecs/config.hpp"
 
 #include <cstddef>
 #include <cstdint>
 
+// TODO: C-compatible types
+
 namespace eld::c_api
 {
     /**
-     * Handle type for Entity
+     * Typedef equivalent for void*. Referenced object is expected to store a tuple of parameters.
      */
-    struct entity_descriptor
-    {
-        size_t id = -1;
-    };
-
-    struct component_descriptor
-    {
-        size_t id = -1;
-    };
+    struct tuple;
 
     /**
-     * Selection result. Owned by core.
+     * Typedef for a policy to extend behavior. Equivalent to void*.
      */
-    struct entity_selection
+    struct policy;
+
+    struct handle;
+    struct type_descriptor;
+    struct entity_descriptor;
+    struct component_descriptor;
+    struct entity_selection;
+    struct component_pointer;
+
+    struct storage_params
     {
-        size_t handle = -1;
-        const entity_descriptor *array = nullptr;
-        size_t length = 0;
+        size_t componentSize{};
+        void (*pInPlaceConstruct)(void *pAllocatedMemory,
+                                  size_t allocatedSize,
+                                  const tuple *args,
+                                  size_t argsSizeBytes){};
+
+        void (*pInPlaceDestroy)(void *pObject, size_t objectSize){};
+        void *pConstructorCallable{};
+        void *pDestructorCallable{};
+    };
+
+    enum error_result
+    {
+        success = 0,
+        invalid_entity_descriptor
     };
 
     enum class reg_error : uint8_t
@@ -45,36 +61,14 @@ namespace eld::c_api
 
     enum class entity_allocation_error : uint8_t
     {
-        success = 0,
-        invalid_entity_descriptor
+        success = error_result::success,
+        invalid_entity_descriptor = error_result::invalid_entity_descriptor
     };
 
     struct component_storage_descriptor
     {
         component_descriptor componentDescriptor{};
         size_t componentSize{};
-    };
-
-    struct tuple;
-
-    struct storage_params
-    {
-        size_t componentSize{};
-        void (*pInPlaceConstruct)(void *pAllocatedMemory,
-                                  size_t allocatedSize,
-                                  const tuple *args,
-                                  size_t argsSizeBytes){};
-
-        void (*pInPlaceDestroy)(void *pObject, size_t objectSize){};
-        void *pConstructorCallable{};
-        void *pDestructorCallable{};
-    };
-
-    struct component_pointer
-    {
-        component_descriptor componentDescriptor;
-        void *pObject;
-        size_t componentSize;
     };
 
     enum class allocation_component_storage_error : uint8_t
@@ -112,6 +106,11 @@ namespace eld::c_api
         invalid_component_id,
     };
 
+    enum class selection_error : uint8_t
+    {
+        success = error_result::success
+    };
+
     extern "C"
     {
         /**
@@ -119,6 +118,7 @@ namespace eld::c_api
          * 1. Relational table.
          *      Description: Maps entities and components.
          *      - select entities with set of given components
+         *      - get components handle by component id from the given entity
          *      - enumerate components for given entity
          *      - add components to entities
          *      - remove components from entities
@@ -140,20 +140,73 @@ namespace eld::c_api
          *      - release. Clears all the resources. Destroys components within the RAII storage.
          */
 
-        SIMPLECS_DECL void register_components(const entity_descriptor &,
+        // TODO: finite specification
+        /**
+         * Associates an array of components to the given entity. All the components must have
+         * unique IDs. One entity can be associated with only one component, though distinct
+         * components may be shared between entities. If a component with new handle is passed,
+         * reassociates the entity with a new component instance.
+         * @param entityDescriptor Entity descriptor to associate components with.
+         * @param array Array of components descriptors. Owned by the caller.
+         * @param length Length of \p array and \p results if \p results is not NULL.
+         * @param results Array of results for each component. May be NULL.
+         * @param policy Reserved parameter for customization. NULL by default.
+         */
+        SIMPLECS_DECL void register_components(const entity_descriptor &entityDescriptor,
                                                const component_descriptor *array,
                                                size_t length,
-                                               reg_error *results);
+                                               reg_error *results,
+                                               const policy *policy);
 
-        SIMPLECS_DECL void unregister_components(const entity_descriptor &,
-                                                 const component_descriptor *array,
+        /**
+         * Removes association of an array of components to the given entity.
+         * @param entityDescriptor Entity descriptor to remove association from
+         * @param array Array of components' type descriptors.
+         * @param length Length of \p array and \p results if \p results is not NULL.
+         * @param results Array of results for each component. May be NULL.
+         * @param policy Reserved parameter for customization. NULL by default.
+         */
+        SIMPLECS_DECL void unregister_components(const entity_descriptor &entityDescriptor,
+                                                 const type_descriptor *array,
                                                  size_t length,
-                                                 unreg_error *results);
+                                                 unreg_error *results,
+                                                 const policy *policy);
 
-        SIMPLECS_DECL void select_entities_by_components(const component_descriptor *array,
+        /**
+         * Select all the entities associated with a given set of components' type descriptors
+         * @param array User-allocated array of components' type descriptors. Owned by caller.
+         * @param length Length of \p array
+         * @param result Output selection. Data is owned by Core. Must be freed after.
+         * @param policy Reserved parameter for customization. NULL by default.
+         */
+        SIMPLECS_DECL void select_entities_by_components(const type_descriptor *array,
                                                          size_t length,
-                                                         entity_selection &result);
+                                                         entity_selection &result,
+                                                         const policy *policy);
+
+        /**
+         * Free selection.
+         */
         SIMPLECS_DECL void free_entity_selection(entity_selection &);
+
+        /**
+         * Get components' descriptors for a given entities selection.
+         * @param entitySelection Selection of entity descriptors. May be owned by the caller or
+         * acquired from \ref select_entities_by_components
+         * @param typeDescriptor Component's type descriptor.
+         * @param array User-allocated Array of components' descriptors. Owned by the caller.
+         * @param length Length of \p array and \p results if \p results is not NULL. Should be
+         * equal to the length of \p entitySelection. If less, only \p length descriptors will be
+         * returned.
+         * @param results
+         * @param policy Reserved parameter for customization. NULL by default.
+         */
+        SIMPLECS_DECL void get_components_by_selection(const entity_selection &entitySelection,
+                                                       const type_descriptor &typeDescriptor,
+                                                       component_descriptor *array,
+                                                       size_t length,
+                                                       selection_error *results,
+                                                       const policy *policy);
 
         /**
          * Allocates entities within the Entity Storage
@@ -194,12 +247,12 @@ namespace eld::c_api
                                component_pointer &pointer);
 
         // TODO: clarify this function. Remove?
-//        SIMPLECS_DECL allocate_component_error
-//            construct_component(const entity_descriptor &entity,
-//                                const component_descriptor &component,
-//                                component_pointer *&pointer,
-//                                const tuple *args,
-//                                size_t argsSizeBytes);
+        //        SIMPLECS_DECL allocate_component_error
+        //            construct_component(const entity_descriptor &entity,
+        //                                const component_descriptor &component,
+        //                                component_pointer *&pointer,
+        //                                const tuple *args,
+        //                                size_t argsSizeBytes);
 
         SIMPLECS_DECL deallocate_component_error
             deallocate_component(const entity_descriptor &entity, component_pointer &pointer);
@@ -210,28 +263,6 @@ namespace eld::c_api
                           component_pointer &pointer);
 
         SIMPLECS_DECL void release_context();
-    }
-
-    constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)
-    {
-        return lhs.id < rhs.id;
-    }
-
-    constexpr inline bool operator==(const entity_descriptor &lhs, const entity_descriptor &rhs)
-    {
-        return !(lhs < rhs) && !(rhs < lhs);
-    }
-
-    constexpr inline bool operator<(const component_descriptor &lhs,
-                                    const component_descriptor &rhs)
-    {
-        return lhs.id < rhs.id;
-    }
-
-    constexpr inline bool operator==(const component_descriptor &lhs,
-                                     const component_descriptor &rhs)
-    {
-        return !(lhs < rhs) && !(rhs < lhs);
     }
 
 }   // namespace eld::c_api

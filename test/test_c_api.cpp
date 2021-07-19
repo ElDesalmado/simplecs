@@ -71,7 +71,7 @@ TEST(c_api_registry, reg_components_ten_already_registered)
 {
     entity_descriptor entity{ 0 };
     auto componentDescriptor = std::make_unique<component_descriptor>();
-    componentDescriptor->id = 1;
+    componentDescriptor->typeId = 1;
     register_components(entity, componentDescriptor.get(), 1, nullptr);
 
     const size_t componentSize = 10;
@@ -89,7 +89,7 @@ TEST(c_api_registry, reg_components_ten_two_already_registered)
 {
     entity_descriptor entity{ 0 };
     auto componentDescriptor = std::make_unique<component_descriptor>();
-    componentDescriptor->id = 0;
+    componentDescriptor->typeId = 0;
     register_components(entity, componentDescriptor.get(), 1, nullptr);
 
     const size_t componentSize = 10;

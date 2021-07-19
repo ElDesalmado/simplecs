@@ -139,7 +139,8 @@ namespace eld
         void register_components(const entity_descriptor &owningEntity,
                                  const component_descriptor *array,
                                  size_t length,
-                                 reg_error *results)
+                                 reg_error *results,
+                                 const policy *)
         {
             if (!array ||   //
                 !length)
@@ -152,9 +153,10 @@ namespace eld
         }
 
         void unregister_components(const entity_descriptor &owningEntity,
-                                   const component_descriptor *array,
+                                   const type_descriptor *array,
                                    size_t length,
-                                   unreg_error *results)
+                                   unreg_error *results,
+                                   const policy *)
         {
             if (!array ||   //
                 !length)

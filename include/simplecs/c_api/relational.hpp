@@ -17,7 +17,7 @@ namespace std
     {
         size_t operator()(const eld::c_api::component_descriptor &component) const noexcept
         {
-            return hash<size_t>()(component.id);
+            return hash<size_t>()(component.typeId);
         }
     };
 }   // namespace std
