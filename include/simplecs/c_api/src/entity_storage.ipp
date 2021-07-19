@@ -2,7 +2,7 @@
 
 #include "simplecs/c_api/entity_storage.hpp"
 
-namespace eld
+namespace simplecs
 {
     namespace c_core
     {

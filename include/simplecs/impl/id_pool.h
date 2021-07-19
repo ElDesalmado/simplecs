@@ -3,7 +3,7 @@
 #include <stack>
 #include <type_traits>
 
-namespace eld::detail
+namespace simplecs::detail
 {
     template<typename IdT>
     class id_pool

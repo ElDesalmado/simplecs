@@ -12,7 +12,7 @@
 #include <optional>
 #include <simplecs/c_api/c_core.hpp>
 
-namespace eld
+namespace simplecs
 {
     namespace c_core
     {

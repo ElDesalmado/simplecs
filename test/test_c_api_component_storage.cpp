@@ -29,11 +29,11 @@ private:
  */
 TEST(c_api_component_storage, deallocation_test_explicit)
 {
-    using namespace eld;
+    using namespace simplecs;
 
     const auto storageParams =
         c_api::storage_params{ sizeof(TestDestructor),
-                               eld::make_destructor<TestDestructor>(),
+                                                      simplecs::make_destructor<TestDestructor>(),
                                nullptr };
 
     c_api::type_descriptor newTypeDescriptor{};
@@ -69,11 +69,11 @@ TEST(c_api_component_storage, deallocation_test_explicit)
  */
 TEST(c_api_component_storage, deallocation_test_implicit)
 {
-    using namespace eld;
+    using namespace simplecs;
 
     const auto storageParams =
         c_api::storage_params{ sizeof(TestDestructor),
-                               eld::make_destructor<TestDestructor>(),
+                                                      simplecs::make_destructor<TestDestructor>(),
                                nullptr };
 
     c_api::type_descriptor newTypeDescriptor{};

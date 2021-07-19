@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace eld::detail
+namespace simplecs::detail
 {
     template <typename EntityDescriptorT, typename ComponentDescriptorT>
     class entity_selection

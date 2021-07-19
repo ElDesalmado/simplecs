@@ -2,7 +2,7 @@
 
 #include "simplecs/registry.hpp"
 
-namespace eld
+namespace simplecs
 {
 
 }

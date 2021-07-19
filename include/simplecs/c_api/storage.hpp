@@ -13,15 +13,15 @@
 #include <vector>
 
 template<>
-struct std::hash<eld::c_api::handle>
+struct std::hash<simplecs::c_api::handle>
 {
-    size_t operator()(const eld::c_api::handle &handle) const
+    size_t operator()(const simplecs::c_api::handle &handle) const
     {
         return std::hash<decltype(handle.h)>{}(handle.h);
     }
 };
 
-namespace eld::c_core
+namespace simplecs::c_core
 {
     using component_id = size_t;
 
@@ -156,7 +156,7 @@ namespace eld::c_core
     private:
         c_api::type_descriptor typeDescriptor_;
         std::unordered_map<handle_type, c_api::object *> map_;
-        eld::detail::id_pool<decltype(std::declval<handle_type>().h)> handlePool_;
+        simplecs::detail::id_pool<decltype(std::declval<handle_type>().h)> handlePool_;
         std::function<void(c_api::object *pObject)> deallocate_;
     };
 

@@ -4,7 +4,7 @@
 #include "simplecs/config.hpp"
 #include "simplecs/impl/id_pool.h"
 
-namespace eld::c_core
+namespace simplecs::c_core
 {
     class entities
     {
@@ -27,7 +27,7 @@ namespace eld::c_core
     private:
         static entities instance_;
 
-        eld::detail::id_pool<entity_id> idPool_;
+        simplecs::detail::id_pool<entity_id> idPool_;
     };
 
 }

@@ -11,19 +11,19 @@
 #include <optional>
 
 template<>
-struct std::hash<eld::c_api::type_descriptor>
+struct std::hash<simplecs::c_api::type_descriptor>
 {
-    size_t operator()(const eld::c_api::type_descriptor &d) const
+    size_t operator()(const simplecs::c_api::type_descriptor &d) const
     {
         return std::hash<size_t>{}(d.typeId);
     }
 };
 
-namespace eld
+namespace simplecs
 {
     namespace c_core
     {
-        using c_component_storage = eld::generic::component_storage<component_storage_impl>;
+        using c_component_storage = simplecs::generic::component_storage<component_storage_impl>;
 
         namespace detail
         {
@@ -36,7 +36,7 @@ namespace eld
 
                     auto res = componentStorages_.template emplace(std::make_pair(
                         c_api::type_descriptor{ id, storageParams.componentSize },
-                        eld::make_component_storage<c_core::component_storage_impl>(
+                        simplecs::make_component_storage<c_core::component_storage_impl>(
                             storageParams,
                             c_api::type_descriptor{ id, storageParams.componentSize })));
 
@@ -68,7 +68,7 @@ namespace eld
 
             private:
                 std::unordered_map<c_api::type_descriptor, c_component_storage> componentStorages_;
-                eld::detail::id_pool<size_t> idPool_;
+                simplecs::detail::id_pool<size_t> idPool_;
             };
         }   // namespace detail
 

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace eld::impl
+namespace simplecs::impl
 {
     template<typename ClassType>
     c_api::component_storage_descriptor component_c<ClassType>::storage_descriptor()

@@ -6,7 +6,7 @@
 #include "simplecs/c_api/relational.hpp"
 #include "simplecs/c_api/storage.hpp"
 
-namespace eld::c_api
+namespace simplecs::c_api
 {
     void release_context()
     {
@@ -15,6 +15,6 @@ namespace eld::c_api
         //        eld::c_core::entities::release();
         //        eld::c_core::storages::release();
 
-        eld::c_core::componentStorages.clear();
+        simplecs::c_core::componentStorages.clear();
     }
 }   // namespace eld::c_api

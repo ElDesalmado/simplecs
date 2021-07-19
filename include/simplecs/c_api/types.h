@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace eld::c_api
+namespace simplecs::c_api
 {
     struct object;
     struct callable;
@@ -119,7 +119,7 @@ namespace eld::c_api
 
 }
 
-namespace eld
+namespace simplecs
 {
     /**
      * Make wrapped stateless destructor for \tp T

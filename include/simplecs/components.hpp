@@ -13,7 +13,7 @@
  * Component implementation based on C api.
  */
 
-namespace eld
+namespace simplecs
 {
     namespace impl
     {

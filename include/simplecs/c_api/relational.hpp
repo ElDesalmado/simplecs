@@ -13,16 +13,16 @@
 namespace std
 {
     template<>
-    struct hash<eld::c_api::component_descriptor>
+    struct hash<simplecs::c_api::component_descriptor>
     {
-        size_t operator()(const eld::c_api::component_descriptor &component) const noexcept
+        size_t operator()(const simplecs::c_api::component_descriptor &component) const noexcept
         {
             return hash<size_t>()(component.typeDescriptor.typeId);
         }
     };
 }   // namespace std
 
-namespace eld::c_core
+namespace simplecs::c_core
 {
     class entity_selection
     {
@@ -76,8 +76,8 @@ namespace eld::c_core
     private:
         static relational_table instance_;
 
-        eld::generic::selector<
-            eld::impl::selector_std<c_api::entity_descriptor, c_api::component_descriptor>>
+        simplecs::generic::selector<
+            simplecs::impl::selector_std<c_api::entity_descriptor, c_api::component_descriptor>>
             selector_;
 
         std::unordered_map<c_api::component_descriptor, component_column> componentsTable_;
@@ -100,7 +100,7 @@ namespace eld::c_core
         static selections instance_;
 
         std::unordered_map<size_t, entity_selection> selections_;
-        eld::detail::id_pool<selection_id> pool_;
+        simplecs::detail::id_pool<selection_id> pool_;
     };
 
 }   // namespace eld::c_core

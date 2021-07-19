@@ -23,7 +23,7 @@
  *
  */
 
-namespace eld
+namespace simplecs
 {
     template<typename...>
     struct type_list

@@ -15,3 +15,4 @@
 
 #include "simplecs/src/registry.ipp"
 #include "simplecs/src/components.ipp"
+#include "simplecs/src/component_storage.ipp"

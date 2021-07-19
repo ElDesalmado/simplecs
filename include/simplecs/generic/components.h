@@ -14,7 +14,7 @@
  *
  */
 
-namespace eld
+namespace simplecs
 {
     namespace custom
     {

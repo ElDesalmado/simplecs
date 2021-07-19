@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace eld::impl
+namespace simplecs::impl
 {
     template<typename EntityT, typename ComponentT>
     class selector_std

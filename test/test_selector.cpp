@@ -8,7 +8,8 @@
 using EntityId = size_t;
 using ComponentId = size_t;
 
-using SelectorStd = eld::generic::selector<eld::impl::selector_std<EntityId, ComponentId>>;
+using SelectorStd =
+    simplecs::generic::selector<simplecs::impl::selector_std<EntityId, ComponentId>>;
 
 using SelectInputType = std::vector<ComponentId>;
 using SelectedType = std::vector<ComponentId>;

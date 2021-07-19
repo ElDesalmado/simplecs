@@ -8,7 +8,7 @@
 
 // TODO: C-compatible types
 
-namespace eld::c_api
+namespace simplecs::c_api
 {
     /**
      * Typedef equivalent for void*. Referenced object is expected to store a tuple of parameters.

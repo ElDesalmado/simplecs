@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace eld
+namespace simplecs
 {
     namespace custom
     {

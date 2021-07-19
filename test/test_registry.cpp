@@ -74,8 +74,8 @@ class TestRegistry : public testing::Test
 protected:
     void SetUp() override { Test::SetUp(); }
     void TearDown() override { Test::TearDown(); }
-    eld::generic::registry<Impl, Traits> registry =
-        eld::make_registry<Impl, Traits>(::testVal, ::testString);
+    simplecs::generic::registry<Impl, Traits> registry =
+        simplecs::make_registry<Impl, Traits>(::testVal, ::testString);
 };
 
 TEST_F(TestRegistry, create_entity_empty)
