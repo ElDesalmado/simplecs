@@ -4,6 +4,8 @@
 
 namespace eld::c_api
 {
+    struct object;
+
     /**
      * Typesafe handle
      */
@@ -54,13 +56,31 @@ namespace eld::c_api
      */
     struct component_pointer
     {
-        void *pObject{};
+        object *pObject{};
         component_descriptor componentDescriptor;
     };
 
     constexpr inline bool operator<(const handle& lhs, const handle& rhs)
     {
         return lhs.h < rhs.h;
+    }
+
+    constexpr inline bool operator==(const handle &lhs, const handle &rhs)
+    {
+        return lhs.h == rhs.h;
+    }
+
+    constexpr inline handle& operator++(handle &h)
+    {
+        ++h.h;
+        return h;
+    }
+
+    constexpr inline const handle operator++(handle &h, int)
+    {
+        auto temp = h;
+        ++h.h;
+        return temp;
     }
 
     constexpr inline bool operator<(const entity_descriptor &lhs, const entity_descriptor &rhs)

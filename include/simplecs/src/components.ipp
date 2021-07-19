@@ -39,7 +39,7 @@ namespace eld::impl
         if ((bool)error)
             std::terminate();
 
-        static_cast<type*>(pointer.pObject)->~type();
+        reinterpret_cast<type*>(pointer.pObject)->~type();
         c_api::deallocate_component(entity_descriptor(), pointer);
     }
 
@@ -51,7 +51,7 @@ namespace eld::impl
         if ((bool)error)
             throw std::invalid_argument("component_c::get: invalid argument");
 
-        return *static_cast<type *>(pointer.pObject);
+        return *reinterpret_cast<type *>(pointer.pObject);
     }
 
     template<typename ClassType>
@@ -62,7 +62,7 @@ namespace eld::impl
         if ((bool)error)
             throw std::invalid_argument("component_c::get: invalid argument");
 
-        return *static_cast<type *>(pointer.pObject);
+        return *reinterpret_cast<type *>(pointer.pObject);
     }
 
     template<typename ClassType>

@@ -10,10 +10,10 @@ namespace eld::c_api
 {
     void release_context()
     {
-        eld::c_core::relational_table::release();
-        eld::c_core::selections::release();
-        eld::c_core::entities::release();
-        eld::c_core::storages::release();
+//        eld::c_core::relational_table::release();
+//        eld::c_core::selections::release();
+//        eld::c_core::entities::release();
+//        eld::c_core::storages::release();
     }
 }
 

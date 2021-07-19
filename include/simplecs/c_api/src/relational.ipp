@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-#include "simplecs/c_api/relational.hpp"
 #include "simplecs/generic/relational_table.h"
+#include "simplecs/generic/selection.h"
+#include "simplecs/generic/component_storage.h"
+
+#include "simplecs/c_api/relational.hpp"
 #include "simplecs/impl/relational_table.h"
 
 #include <cassert>
@@ -125,11 +128,11 @@ namespace eld
             return out;
         }
 
-        void selections::free(c_api::entity_selection &selection)
+        void selections::free(c_api::entity_selection &/*selection*/)
         {
-            selections_.erase(selection.handle);
-            pool_.free(selection.handle);
-            selection = {};
+//            selections_.erase(selection.handle);
+//            pool_.free(selection.handle);
+//            selection = {};
         }
 
         void selections::release() { selections::instance_ = {}; }
@@ -154,20 +157,20 @@ namespace eld
                                                                      results);
         }
 
-        void unregister_components(const entity_descriptor &owningEntity,
+        void unregister_components(const entity_descriptor &/*owningEntity*/,
                                    const type_descriptor *array,
                                    size_t length,
-                                   unreg_error *results,
+                                   unreg_error */*results*/,
                                    const policy *)
         {
             if (!array ||   //
                 !length)
                 return;
 
-            c_core::relational_table::instance().unregister_components(owningEntity,
-                                                                       array,
-                                                                       length,
-                                                                       results);
+//            c_core::relational_table::instance().unregister_components(owningEntity,
+//                                                                       array,
+//                                                                       length,
+//                                                                       results);
         }
 
         void select_entities_by_components(const component_descriptor *array,

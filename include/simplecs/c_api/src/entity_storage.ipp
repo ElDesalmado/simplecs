@@ -10,9 +10,9 @@ namespace eld
 
         entities &entities::instance() { return instance_; }
 
-        c_api::entity_allocation_error entities::allocate(c_api::entity_descriptor &descriptor)
+        c_api::entity_allocation_error entities::allocate(c_api::entity_descriptor &/*descriptor*/)
         {
-            descriptor.id = idPool_.next_available();
+//            descriptor.handle = idPool_.next_available();
             return c_api::entity_allocation_error::success;
         }
 
@@ -28,13 +28,13 @@ namespace eld
             }
         }
 
-        c_api::entity_allocation_error entities::release(c_api::entity_descriptor &descriptor)
+        c_api::entity_allocation_error entities::release(c_api::entity_descriptor &/*descriptor*/)
         {
-            if (idPool_.is_free(descriptor.id))
-                return c_api::entity_allocation_error::invalid_entity_descriptor;
-
-            idPool_.free(descriptor.id);
-            descriptor = {};
+//            if (idPool_.is_free(descriptor.id))
+//                return c_api::entity_allocation_error::invalid_entity_descriptor;
+//
+//            idPool_.free(descriptor.id);
+//            descriptor = {};
 
             return c_api::entity_allocation_error::success;
         }
@@ -56,18 +56,18 @@ namespace eld
 
     namespace c_api
     {
-        void allocate_entities(entity_descriptor *&array,
-                               size_t length,
-                               entity_allocation_error *&results)
+        void allocate_entities(entity_descriptor *&/*array*/,
+                               size_t /*length*/,
+                               entity_allocation_error *&/*results*/)
         {
-            c_core::entities::instance().allocate(array, length, results);
+//            c_core::entities::instance().allocate(array, length, results);
         }
 
-        void deallocate_entities(entity_descriptor *&array,
-                                 size_t length,
-                                 entity_allocation_error *&results)
+        void deallocate_entities(entity_descriptor *&/*array*/,
+                                 size_t /*length*/,
+                                 entity_allocation_error *&/*results*/)
         {
-            c_core::entities::instance().release(array, length, results);
+//            c_core::entities::instance().release(array, length, results);
         }
     }   // namespace c_api
 }   // namespace eld

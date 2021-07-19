@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplecs/c_api/c_core.hpp"
+#include "simplecs/c_api/types.h"
 #include "simplecs/config.hpp"
 
 #include "simplecs/impl/id_pool.h"
@@ -9,87 +9,136 @@
 #include <limits>
 #include <optional>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
+
+template<>
+struct std::hash<eld::c_api::handle>
+{
+    size_t operator()(const eld::c_api::handle &handle) const
+    {
+        return std::hash<decltype(handle.h)>{}(handle.h);
+    }
+};
 
 namespace eld::c_core
 {
     using component_id = size_t;
 
-    class component_storage
+    struct component_traits
     {
-    public:
-        component_storage(component_id id, const c_api::storage_params &params);
-
-        c_api::allocate_component_error allocate(const c_api::entity_descriptor &entity,
-                                                 c_api::component_pointer &pointer);
-        c_api::deallocate_component_error deallocate(const c_api::entity_descriptor &entity,
-                                                     c_api::component_pointer &pointer);
-
-        c_api::allocate_component_error construct(const c_api::entity_descriptor &entity,
-                                                  c_api::component_pointer &pointer,
-                                                  const c_api::tuple *args,
-                                                  size_t argsSizeBytes);
-
-        c_api::get_component_error get_component(const c_api::entity_descriptor &entity,
-                                                 c_api::component_pointer &pointer);
-
-        ~component_storage();
-
-    private:
-        using entity_id = size_t;
-        using pointer_type = size_t;
-        using constructor_type = std::function<void(void *pAllocatedMemory,
-                                                    size_t allocatedSize,
-                                                    const c_api::tuple *args,
-                                                    size_t argsSizeBytes)>;
-
-        using destructor_type = std::function<void(void *pObject, size_t objectSize)>;
-
-        static constructor_type make_constructor(const c_api::storage_params &params);
-        static destructor_type make_destructor(const c_api::storage_params &params);
-
-        std::optional<pointer_type> find_component(const c_api::entity_descriptor &entity);
-
-        void in_place_destroy(pointer_type pObject);
-        static void free(pointer_type pointer);
-
-    private:
-        const component_id componentId_;
-        const size_t componentSize_;
-
-        constructor_type pInPlaceConstructor_{};
-        destructor_type pInPlaceDestructor_{};
-
-        // TODO: use contiguous storage
-        // TODO: use custom objects?
-        std::unordered_map<entity_id, pointer_type, std::hash<entity_id>> components_;
+        using handle_type = c_api::handle;
+        using component_type = void;
+        using component_reference_type = c_api::component_pointer;
     };
 
-    class storages
+    class component_storage_impl
     {
     public:
-        static storages &instance();
-        static void release();
+        using component_traits = c_core::component_traits;
+        using handle_type = typename component_traits::handle_type;
+        using component_reference_type = typename component_traits::component_reference_type;
 
-        std::optional<std::reference_wrapper<component_storage>> get_storage(
-            const c_api::component_descriptor &descriptor);
+        component_storage_impl(const c_api::type_descriptor &typeDescriptor,
+                               void (*pDestroy)(c_api::callable *, c_api::object *),
+                               c_api::callable *pCallable)
+          : typeDescriptor_(typeDescriptor),
+            deallocate_(component_storage_impl::make_destructor(pDestroy, pCallable))
+        {
+        }
 
-        c_api::allocation_component_storage_error init_storage(
-            c_api::component_storage_descriptor &outputDescriptor,
-            const c_api::storage_params &inputParams);
+        std::vector<component_reference_type> emplace_components(int num)
+        {
+            assert(num >= 0 && "Component num must not be negative!");
+            std::vector<component_reference_type> out;
+            out.reserve(num);
 
-        c_api::release_component_storage_error release(
-            c_api::component_storage_descriptor &storageDescriptor);
+            while (num--)
+            {
+                const auto handle = handlePool_.next_available();
+                assert(map_.find(handle) == map_.cend() && "Handle already registered!");
+                c_api::component_pointer allocated{
+                    component_storage_impl::allocate(typeDescriptor_.typeSize),
+                    c_api::component_descriptor{ handle, typeDescriptor_ }
+                };
+                map_.emplace(std::make_pair(handle, allocated));
+                out.push_back(allocated);
+            }
+
+            return out;
+        }
+
+        template<template<typename> class Container>
+        auto remove(const Container<handle_type> &handles)
+        {
+            using namespace c_api;
+            std::vector<deallocate_component_error> errors;
+            errors.reserve(handles.size());
+
+            std::for_each(handles.cbegin(),
+                          handles.cend(),
+                          [this, &errors](const handle_type &handle)
+                          {
+                              auto found = map_.find(handle);
+                              if (found == map_.cend())
+                              {
+                                  errors.push_back(
+                                      deallocate_component_error::invalid_component_descriptor);
+                                  return;
+                              }
+                              this->deallocate(found->second.pObject);
+                              map_.erase(found);
+                          });
+        }
+
+        component_reference_type get_component(const handle_type &componentHandle)
+        {
+            auto found = map_.find(componentHandle);
+            if (found == map_.cend())
+            {
+                throw std::invalid_argument("component_storage_impl: invalid component handle");
+            }
+
+            return found->second;
+        }
+
+        const component_reference_type get_component(const handle_type &componentHandle) const
+        {
+            auto found = map_.find(componentHandle);
+            if (found == map_.cend())
+            {
+                throw std::invalid_argument("component_storage_impl: invalid component handle");
+            }
+
+            return found->second;
+        }
 
     private:
-        using storage_id = size_t;
+        using component_size = decltype(std::declval<c_api::type_descriptor>().typeSize);
+
+        static c_api::object *allocate(component_size componentSize)
+        {
+            return static_cast<c_api::object *>(operator new(componentSize));
+        }
+        static std::function<void(c_api::object *pObject)> make_destructor(
+            void (*pFunction)(c_api::callable *, c_api::object *),
+            c_api::callable *pCallable)
+        {
+            assert(pFunction && "Function is nullptr!");
+            return [=](c_api::object *pObject) { pFunction(pCallable, pObject); };
+        }
+
+        void deallocate(c_api::object *pObject)
+        {
+            assert(deallocate_ && "Invalid deallocate_");
+            deallocate_(pObject);
+        }
 
     private:
-        static storages instance_;
-
-        // TODO: use descriptor ?
-        std::unordered_map<size_t, component_storage> map_;
-        eld::detail::id_pool<storage_id> idPool_;
+        c_api::type_descriptor typeDescriptor_;
+        std::unordered_map<handle_type, c_api::component_pointer> map_;
+        eld::detail::id_pool<handle_type> handlePool_;
+        std::function<void(c_api::object *pObject)> deallocate_;
     };
 
 }   // namespace eld::c_core

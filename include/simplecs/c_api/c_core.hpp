@@ -16,6 +16,16 @@ namespace eld::c_api
     struct tuple;
 
     /**
+     * Typedef for a callable object. Equivalent to void*
+     */
+    struct callable;
+
+    /**
+     * Typedef for a void* object.
+     */
+    struct object;
+
+    /**
      * Typedef for a policy to extend behavior. Equivalent to void*.
      */
     struct policy;
@@ -245,14 +255,6 @@ namespace eld::c_api
             allocate_component(const entity_descriptor &entity,
                                const component_descriptor &componentDescriptor,
                                component_pointer &pointer);
-
-        // TODO: clarify this function. Remove?
-        //        SIMPLECS_DECL allocate_component_error
-        //            construct_component(const entity_descriptor &entity,
-        //                                const component_descriptor &component,
-        //                                component_pointer *&pointer,
-        //                                const tuple *args,
-        //                                size_t argsSizeBytes);
 
         SIMPLECS_DECL deallocate_component_error
             deallocate_component(const entity_descriptor &entity, component_pointer &pointer);
