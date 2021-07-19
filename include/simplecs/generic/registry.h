@@ -127,7 +127,7 @@ namespace eld
              * Create new entity.
              * @return Created entity.
              */
-            entity_type create_entity() { return custom::create_entity(impl_); }
+            entity_type create_entity() { return custom::create_entity<entity_type>(impl_); }
 
             /**
              * Try to create new entity with user-provided descriptor.
@@ -137,7 +137,7 @@ namespace eld
              */
             entity_type create_entity(const entity_descriptor &descriptor)
             {
-                return custom::create_entity(impl_, descriptor);
+                return custom::create_entity<entity_type>(impl_, descriptor);
             }
 
             /**
