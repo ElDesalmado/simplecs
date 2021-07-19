@@ -24,7 +24,6 @@ protected:
     SelectInputType inputComponents{};
     SelectedType selected{};
 };
-// TODO: test scenarios and implementations
 
 TEST_F(TestSelectorStd, empty_table)
 {
