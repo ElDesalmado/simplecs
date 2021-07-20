@@ -8,53 +8,7 @@
 
 namespace simplecs
 {
-    namespace detail
-    {
-        template<typename ContainerT>
-        using iterator_category =
-            typename std::iterator_traits<typename ContainerT::iterator>::iterator_category;
 
-        template<typename ContainerT>
-        using value_type = typename std::iterator_traits<typename ContainerT::iterator>::value_type;
-
-        template<typename ContainerT,
-                 bool /*false*/ =
-                     std::is_same_v<iterator_category<ContainerT>, std::random_access_iterator_tag>>
-        class array_provider
-        {
-        public:
-            using value_type = value_type<ContainerT>;
-
-            array_provider(const ContainerT &container)
-              : data_(container.cbegin(), container.cend())
-            {
-            }
-
-            value_type *data() { return data_.data(); }
-
-            [[nodiscard]] size_t size() const { return data_.size(); }
-
-        private:
-            std::vector<value_type> data_;
-        };
-
-        template<typename ContainerT>
-        class array_provider<ContainerT, true>
-        {
-        public:
-            using value_type = value_type<ContainerT>;
-
-            array_provider(const ContainerT &container) : container_(container) {}
-
-            value_type *data() { return container_.data(); }
-
-            [[nodiscard]] size_t size() const { return container_.size(); }
-
-        private:
-            const ContainerT &container_;
-        };
-
-    }   // namespace detail
 
     namespace c_core
     {

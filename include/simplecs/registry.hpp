@@ -22,6 +22,14 @@ namespace simplecs
         {
             return simplecs::make_component_storage<component_storage_impl<ClassType>>();
         }
+
+        using relational_table = simplecs::generic::relational_table<relational_table_impl>;
+
+        inline relational_table get_relational_table()
+        {
+            return simplecs::make_relational_table<relational_table_impl>();
+        }
+
     }   // namespace eld
 
 }   // namespace simplecs

@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <utility>
 
+// TODO: clarification for handles and descriptors
+
 namespace simplecs::c_api
 {
     struct object;
