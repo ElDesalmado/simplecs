@@ -36,13 +36,7 @@ namespace simplecs::c_api
     struct component_descriptor;
     struct entity_selection;
     struct component_pointer;
-
-    struct storage_params
-    {
-        size_t componentSize{};
-        void (*pDestroy)(c_api::callable *, c_api::object *){};
-        c_api::callable *pCallable{};
-    };
+    struct storage_params;
 
     enum error_result
     {
@@ -50,11 +44,7 @@ namespace simplecs::c_api
         invalid_entity_descriptor
     };
 
-    enum class reg_error : uint8_t
-    {
-        success = 0,
-        component_already_registered
-    };
+    enum class reg_error : uint8_t;
 
     enum class unreg_error : uint8_t
     {
@@ -193,6 +183,7 @@ namespace simplecs::c_api
          */
         SIMPLECS_DECL void free_entity_selection(entity_selection &);
 
+        // TODO: what is this function for?
         /**
          * Get components' descriptors for a given entities selection.
          * @param entitySelection Selection of entity descriptors. May be owned by the caller or
@@ -265,6 +256,6 @@ namespace simplecs::c_api
 }   // namespace eld::c_api
 
 #ifdef SIMPLECS_HEADER_ONLY
+#    include "simplecs/c_api/src/component_storage.ipp"
 #    include "simplecs/c_api/src/relational.ipp"
-#    include "simplecs/c_api/src/storage.ipp"
 #endif

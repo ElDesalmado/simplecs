@@ -2,7 +2,7 @@
 
 #include "simplecs/component_storage.hpp"
 
-#include "simplecs/c_api/storage.hpp"
+#include "simplecs/c_api/component_storage.hpp"
 
 #include <cassert>
 

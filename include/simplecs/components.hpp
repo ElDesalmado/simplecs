@@ -4,8 +4,8 @@
 #include "simplecs/generic/components.h"
 
 // TODO: use only c_api types
+#include "simplecs/c_api/component_storage.hpp"
 #include "simplecs/c_api/relational.hpp"
-#include "simplecs/c_api/storage.hpp"
 
 #include <cstddef>
 

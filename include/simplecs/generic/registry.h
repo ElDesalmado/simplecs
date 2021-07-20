@@ -25,11 +25,6 @@
 
 namespace simplecs
 {
-    template<typename...>
-    struct type_list
-    {
-    };
-
     template<typename ComponentT, typename... ArgsT>
     struct component_args
     {

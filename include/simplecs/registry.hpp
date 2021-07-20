@@ -7,6 +7,7 @@
 #include "simplecs/generic/relational_table.h"
 
 #include "simplecs/component_storage.hpp"
+#include "simplecs/relational_table.hpp"
 
 namespace simplecs
 {

@@ -141,52 +141,6 @@ namespace simplecs
 
     namespace c_api
     {
-        void register_components(const entity_descriptor &owningEntity,
-                                 const component_descriptor *array,
-                                 size_t length,
-                                 reg_error *results,
-                                 const policy *)
-        {
-            if (!array ||   //
-                !length)
-                return;
 
-            c_core::relational_table::instance().register_components(owningEntity,
-                                                                     array,
-                                                                     length,
-                                                                     results);
-        }
-
-        void unregister_components(const entity_descriptor &/*owningEntity*/,
-                                   const type_descriptor *array,
-                                   size_t length,
-                                   unreg_error */*results*/,
-                                   const policy *)
-        {
-            if (!array ||   //
-                !length)
-                return;
-
-//            c_core::relational_table::instance().unregister_components(owningEntity,
-//                                                                       array,
-//                                                                       length,
-//                                                                       results);
-        }
-
-        void select_entities_by_components(const component_descriptor *array,
-                                           size_t length,
-                                           entity_selection &result)
-        {
-            using difference_type = std::iterator_traits<decltype(array)>::difference_type;
-            result = c_core::selections::instance().store(   //
-                c_core::relational_table::instance().select(
-                    std::vector<component_descriptor>(array,
-                                                      std::next(array, difference_type(length)))));
-        }
-
-        void free_entity_selection(entity_selection &selection)
-        {
-            c_core::selections::instance().free(selection);
-        }
     }   // namespace c_api
 }   // namespace eld

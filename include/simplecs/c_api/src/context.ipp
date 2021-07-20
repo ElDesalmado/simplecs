@@ -2,9 +2,9 @@
 
 #include "simplecs/c_api/context.hpp"
 
+#include "simplecs/c_api/component_storage.hpp"
 #include "simplecs/c_api/entity_storage.hpp"
-#include "simplecs/c_api/relational.hpp"
-#include "simplecs/c_api/storage.hpp"
+//#include "simplecs/c_api/relational.hpp"
 
 namespace simplecs::c_api
 {

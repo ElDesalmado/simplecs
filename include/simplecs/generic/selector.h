@@ -7,12 +7,12 @@ namespace simplecs
 {
     namespace custom
     {
-        template <typename ContainerT, typename ImplT>
-        constexpr bool empty(const ContainerT& container, const ImplT&)
+        template<typename ContainerT, typename ImplT>
+        constexpr bool empty(const ContainerT &container, const ImplT &)
         {
             return container.empty();
         }
-    }
+    }   // namespace custom
 
     namespace generic
     {
@@ -25,22 +25,26 @@ namespace simplecs
             using component_id_type = typename ImplT::component_id_type;
             using result_type = typename ImplT::result_type;
 
-            template<bool DefaultConstructible = std::is_default_constructible_v<implementation_type>,
-                     std::enable_if_t<DefaultConstructible, int>* = nullptr>
-            selector()
-                : impl_()
-            {}
+            template<
+                bool DefaultConstructible = std::is_default_constructible_v<implementation_type>,
+                std::enable_if_t<DefaultConstructible, int> * = nullptr>
+            selector() : impl_()
+            {
+            }
 
-            template <typename ... ArgsT>
-            selector(ArgsT &&...args)
-                : impl_(std::forward<ArgsT>(args)...)
-            {}
+            template<typename... ArgsT>
+            selector(ArgsT &&...args) : impl_(std::forward<ArgsT>(args)...)
+            {
+            }
 
             template<template<class, class> typename MapT,
-                     template<class> typename ComponentColumnT,
-                     template<class> typename InputContainerT>
-            constexpr result_type operator()(const MapT<component_id_type, ComponentColumnT<entity_id_type>> &componentsTable,
-                                                   const InputContainerT<component_id_type> &componentsToSelect)
+                     template<class>
+                     typename ComponentColumnT,
+                     template<class>
+                     typename InputContainerT>
+            constexpr result_type operator()(
+                const MapT<component_id_type, ComponentColumnT<entity_id_type>> &componentsTable,
+                const InputContainerT<component_id_type> &componentsToSelect)
             {
                 if (custom::empty(componentsTable, impl_) ||
                     custom::empty(componentsToSelect, impl_))
@@ -56,7 +60,6 @@ namespace simplecs
         private:
             implementation_type impl_;
         };
-    }// namespace generic
+    }   // namespace generic
 
-
-}// namespace eld
+}   // namespace simplecs

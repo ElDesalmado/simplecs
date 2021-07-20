@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 
 namespace simplecs::c_api
@@ -60,6 +61,19 @@ namespace simplecs::c_api
     {
         object *pObject{};
         component_descriptor componentDescriptor;
+    };
+
+    struct storage_params
+    {
+        size_t componentSize{};
+        void (*pDestroy)(c_api::callable *, c_api::object *){};
+        c_api::callable *pCallable{};
+    };
+
+    enum class reg_error : uint8_t
+    {
+        success = 0,
+        component_already_registered
     };
 
     constexpr inline bool operator<(const handle& lhs, const handle& rhs)

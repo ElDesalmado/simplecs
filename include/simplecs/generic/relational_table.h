@@ -22,31 +22,38 @@ namespace simplecs
          */
         template<template<typename...> class SelectionT,
                  template<typename...>
-                 class TagIncludeT,
-                 template<typename...>
-                 class TagExcludeT,
+                 class TypeListT,
                  typename... ComponentT,
                  typename... ExcludeComponentT,
                  typename ImplT>
         SelectionT<ComponentT...> select_entities(ImplT &impl,
-                                                  TagIncludeT<ComponentT...> tagInclude,
-                                                  TagExcludeT<ExcludeComponentT...> tagExclude)
+                                                  TypeListT<ComponentT...> tagInclude,
+                                                  TypeListT<ExcludeComponentT...> tagExclude)
         {
             return impl.select_entities(tagInclude, tagExclude);
         }
 
         /**
          * Customisation point for registering components.
-         * @tparam ComponentsT
-         * @tparam EntityDescriptorT
+         * @throws Implementation-defined exception on error.
+         * @tparam EntityHandleT
          * @tparam ImplT
+         * @tparam ContainerT
+         * @tparam ComponentHandleT
          * @param impl
-         * @param entityDescriptorT
+         * @param entityHandle
+         * @param componentHandles
          */
-        template<typename... ComponentsT, typename EntityDescriptorT, typename ImplT>
-        void register_components(ImplT &impl, const EntityDescriptorT &entityDescriptorT)
+        template<typename EntityHandleT,
+                 typename ImplT,
+                 template<typename>
+                 typename ContainerT,
+                 typename ComponentHandleT>
+        auto register_components(ImplT &impl,
+                                 const EntityHandleT &entityHandle,
+                                 const ContainerT<ComponentHandleT> &componentHandles)
         {
-            impl.template register_components<ComponentsT...>(entityDescriptorT);
+            return impl.register_components(entityHandle, componentHandles);
         }
 
         /**
@@ -84,6 +91,11 @@ namespace simplecs
 
     }   // namespace custom
 
+    template<typename...>
+    struct type_list
+    {
+    };
+
     namespace generic
     {
         template<typename... Components>
@@ -101,21 +113,21 @@ namespace simplecs
          * @tparam TraitsT Traits collection for implementation
          * @tparam ImplT Composition type for implementation.
          */
-        template<typename ImplT, typename TraitsT>
+        template<typename ImplT, typename TraitsT = typename ImplT::traits>
         class relational_table
         {
         public:
             using implementation_type = ImplT;
             using traits = TraitsT;
-            using entity_traits = typename traits::entity_traits;
-            using component_traits = typename traits::component_traits;
+            using entity_handle_type = typename traits::entity_handle_type;
+            using component_handle_type = typename traits::component_handle_type;
 
-            using entity_descriptor_type = typename entity_traits::entity_descriptor_type;
+            // TODO: Do I need this?
+//            template<typename ComponentT>
+//            using component_reference_type =
+//                typename component_handle_type::template component_reference_type<ComponentT>;
 
-            template<typename ComponentT>
-            using component_reference_type =
-                typename component_traits::template component_reference_type<ComponentT>;
-
+            // TODO: Do I need this?
             template<typename... ComponentT>
             using entity_selection_type =
                 typename implementation_type::template entity_selection_type<ComponentT...>;
@@ -160,9 +172,10 @@ namespace simplecs
              */
             template<typename... ComponentsT, typename... ExcludeComponentsT>
             entity_selection_type<ComponentsT...> select_entities(
-                include_components<ComponentsT...> includeTag,
-                exclude_components<ExcludeComponentsT...> excludeTag)
+                type_list<ComponentsT...> includeTag,
+                type_list<ExcludeComponentsT...> excludeTag)
             {
+                // TODO: static assert include and exclude don't overlap
                 return custom::select_entities<entity_selection_type>(impl_,
                                                                       includeTag,
                                                                       excludeTag);
@@ -174,10 +187,11 @@ namespace simplecs
              * @tparam ComponentsT
              * @param entityDescriptor
              */
-            template<typename... ComponentsT>
-            void register_components(const entity_descriptor_type &entityDescriptor)
+            template<template<typename> typename ContainerT>
+            auto register_components(const entity_handle_type &entityDescriptor,
+                                     const ContainerT<component_handle_type> &componentHandles)
             {
-                return custom::register_components<ComponentsT...>(impl_, entityDescriptor);
+                return custom::register_components(impl_, entityDescriptor, componentHandles);
             }
 
             /**
@@ -187,13 +201,14 @@ namespace simplecs
              * @param entityDescriptor
              * @param componentReferences
              */
-            template<typename... ComponentsT>
-            void register_components(
-                const entity_descriptor_type &entityDescriptor,
-                std::tuple<component_reference_type<ComponentsT>...> componentReferences)
-            {
-                return custom::register_components(impl_, entityDescriptor, componentReferences);
-            }
+             // TODO: use Facade to implement this?
+//            template<typename... ComponentsT>
+//            void register_components(
+//                const entity_handle_type &entityDescriptor,
+//                std::tuple<component_reference_type<ComponentsT>...> componentReferences)
+//            {
+//                return custom::register_components(impl_, entityDescriptor, componentReferences);
+//            }
 
             /**
              * Remove association of a given \p entityDescriptor with \p ComponentsT
@@ -201,7 +216,7 @@ namespace simplecs
              * @param entityDescriptor
              */
             template<typename... ComponentsT>
-            void unregister_components(const entity_descriptor_type &entityDescriptor)
+            void unregister_components(const entity_handle_type &entityDescriptor)
             {
                 return custom::unregister_components<ComponentsT...>(impl_, entityDescriptor);
             }
@@ -212,10 +227,10 @@ namespace simplecs
 
     }   // namespace generic
 
-    template<typename ImplT, typename TraitsT, typename... ImplArgsT>
+    template<typename ImplT, typename TraitsT = typename ImplT::traits, typename... ImplArgsT>
     constexpr generic::relational_table<ImplT, TraitsT> make_relational_table(ImplArgsT &&...args)
     {
         return generic::relational_table<ImplT, TraitsT>(std::forward<ImplArgsT>(args)...);
     }
 
-}   // namespace eld
+}   // namespace simplecs
