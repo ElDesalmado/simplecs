@@ -183,7 +183,6 @@ namespace simplecs::c_api
          */
         SIMPLECS_DECL void free_entity_selection(entity_selection &);
 
-        // TODO: what is this function for?
         /**
          * Get components' descriptors for a given entities selection.
          * @param entitySelection Selection of entity descriptors. May be owned by the caller or

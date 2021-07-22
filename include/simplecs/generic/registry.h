@@ -92,16 +92,16 @@ namespace simplecs
             return impl.emplace_components(std::forward<ComponentsT>(components)...);
         }
 
-        template<typename SelectionType,
-                 typename ImplT,
-                 typename EntityDescriptorT,
-                 typename... ComponentsT>
-        SelectionType select_entities(ImplT &impl,
-                                      const EntityDescriptorT &entityDescriptor,
-                                      type_list<ComponentsT...> including)
-        {
-            return impl.select_entities(entityDescriptor, including);
-        }
+//        template<typename SelectionType,
+//                 typename ImplT,
+//                 typename EntityDescriptorT,
+//                 typename... ComponentsT>
+//        SelectionType select_entities(ImplT &impl,
+//                                      const EntityDescriptorT &entityDescriptor,
+//                                      type_list<ComponentsT...> including)
+//        {
+//            return impl.select_entities(entityDescriptor, including);
+//        }
 
     }   // namespace custom
 
@@ -194,14 +194,14 @@ namespace simplecs
              * @param entityDescriptor
              * @return
              */
-            template<typename... ComponentsT>
-            selection_type<ComponentsT...> select(const entity_descriptor &entityDescriptor)
-            {
-                return custom::select_entities<selection_type<ComponentsT...>>(
-                    impl_,
-                    entityDescriptor,
-                    type_list<ComponentsT...>());
-            }
+//            template<typename... ComponentsT>
+//            selection_type<ComponentsT...> select(const entity_descriptor &entityDescriptor)
+//            {
+//                return custom::select_entities<selection_type<ComponentsT...>>(
+//                    impl_,
+//                    entityDescriptor,
+//                    type_list<ComponentsT...>());
+//            }
 
         private:
             implementation_type impl_;

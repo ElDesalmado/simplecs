@@ -35,59 +35,17 @@ namespace simplecs::c_core
         void register_components(const entity_handle_type &owningEntity,
                                  const component_handle_type *array,
                                  size_t length,
-                                 c_api::reg_error * /*results*/)
-        {
-            using difference_type = std::iterator_traits<decltype(array)>::difference_type;
-
-            // TODO: errors
-            std::for_each(
-                array,
-                std::next(array, difference_type(length)),
-                [&owningEntity, this](const component_handle_type &componentHandle)
-                {
-                    // insert if not found
-                    componentToEntityMap_[componentHandle.typeDescriptor].template emplace(
-                        owningEntity);
-                    entityToComponentMap_[owningEntity] = componentHandle;
-                });
-        }
+                                 c_api::reg_error * /*results*/);
 
         void unregister_components(const entity_handle_type &owningEntity,
                                    const component_type *array,
                                    size_t length,
-                                   c_api::unreg_error * /*results*/)
-        {
-            using difference_type = std::iterator_traits<decltype(array)>::difference_type;
-
-            // TODO: errors
-            std::for_each(array,
-                          std::next(array, difference_type(length)),
-                          [&owningEntity, this](const component_type &componentHandle)
-                          {
-                              // insert if not found
-                              componentToEntityMap_[componentHandle].erase(owningEntity);
-                              entityToComponentMap_.erase(owningEntity);
-                          });
-        }
+                                   c_api::unreg_error * /*results*/);
 
         c_api::entity_selection select_entities(
-            const std::vector<component_type> &componentsToSelect)
-        {
-            const auto handle = c_api::handle{ selectionHandlePool_.next_available() };
-            std::vector<entity_handle_type> selectedEntities =
-                selector_(componentToEntityMap_, componentsToSelect);
+            const std::vector<component_type> &componentsToSelect);
 
-            c_api::entity_selection selection{handle, selectedEntities.data(), selectedEntities.size()};
-            selections_.emplace(std::make_pair(handle, std::move(selectedEntities)));
-
-            return selection;
-        }
-
-        void free_selection(const selection_handle& handle)
-        {
-            selections_.erase(handle);
-            selectionHandlePool_.free(handle.h);
-        }
+        void free_selection(const selection_handle& handle);
 
     private:
         std::unordered_map<component_type, std::set<entity_handle_type>> componentToEntityMap_;
@@ -99,6 +57,7 @@ namespace simplecs::c_core
         simplecs::detail::id_pool<size_t> selectionHandlePool_;
         generic::selector<impl::selector_std<entity_handle_type, component_type>> selector_;
     };
+
 
 }   // namespace simplecs::c_core
 
